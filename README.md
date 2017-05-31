@@ -19,7 +19,7 @@ While you might be able to integrate `hitch` with other projects as well, we usu
 Ecosystem (or, What Hitch Is Not)
 ---------------------------------
 
-`hitch` is not a package manager for end-user host maintinance -- use REDACTED for more automation of that process (it gets its information and updates from `hitch`).
+`hitch` is not a package manager for end-user host maintenance -- use REDACTED for more automation of that process (it gets its information and updates from `hitch`).
 
 `hitch` does not track upstream releases (source repos, etc) automatically -- but the REDACTED project does, and pushes that information into `hitch` (we use it to maintain our public builds tree).
 

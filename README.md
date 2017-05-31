@@ -16,6 +16,36 @@ While you might be able to integrate `hitch` with other projects as well, we usu
 
 ---
 
+What does hitch solve?
+----------------------
+
+Name stuff:
+
+```
+repeatr pack "./" | hitch name "projname.org/thing:1.8:amd64-linux"
+```
+
+Fetch stuff by name:
+
+```
+repeatr unpack "$(hitch show "projname.org/thing:1.8:amd64-linux")"
+```
+
+Share names:
+
+```
+hitch pull github.com/polydawn/hitch-records
+```
+
+Audit stuff:
+
+```
+[ ! -z "$(hitch explain "$WARE_HASH" --recursive --hazards)" ] \
+  && {echo nope nope nope; exit 1; }
+```
+
+---
+
 Ecosystem (or, What Hitch Is Not)
 ---------------------------------
 

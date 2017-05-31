@@ -55,7 +55,7 @@ Ecosystem (or, What Hitch Is Not)
 
 `hitch` does not manage automatic builds -- but REDACTED does, by looking at a `hitch` database and formula templates and triggers, and calculating what new things need to be built!
 
-`hitch` not a CI service -- look to REDACTED, which combines `hitch` and REDACTED (and even REDACTED clusters!) to automate builds triggered directly from source pushes.
+`hitch` is not a CI service -- look to REDACTED, which combines `hitch` and REDACTED (and even REDACTED clusters!) to automate builds triggered directly from source pushes.
 
 ---
 

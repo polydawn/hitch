@@ -26,3 +26,31 @@ Ecosystem (or, What Hitch Is Not)
 `hitch` does not manage automatic builds -- but REDACTED does, by looking at a `hitch` database and formula templates and triggers, and calculating what new things need to be built!
 
 `hitch` not a CI service -- look to REDACTED, which combines `hitch` and REDACTED (and even REDACTED clusters!) to automate builds triggered directly from source pushes.
+
+---
+
+What are 'updates', really?
+---------------------------
+
+
+"How should I update my dependences" is a question that people can go to war over.
+
+Therefore, we don't answer it.
+
+Instead, `hitch` provides a framework for describing what *is* released, *how* it was built, and simple *metadata* for describing versions.
+(And for a bonus, any *verification* and gating steps that required additional containers can be described in a release record as well.)
+
+"Metadata" is interpreted broadly, and the string grabbag there can be used to bind with almost any system you can imagine.
+(We have some tools for seeing things as "release tracks"; you can use "semver"-style concepts just as easily.)
+However, we also have a specific eye toward one thing: "hazard"-flagging metadata.
+
+"Hazard" flags are kind of metadata also allows free text,
+but declared separately so that all tooling can see it clearly, and any "hazard" metadata at all can be taken to mean "this should not be used".
+This allows all different kinds of version/update/resolver/templater tools to consistently agree to reject anything that is marked as having CVEs, for example --
+without actually requiring them all to share an understanding of "CVE", or any other security notice format for that matter.
+Making "hazard" metadata explicit means safety protocols are always followed, even as we have diverse tooling for how to update.
+
+`hitch` provides information --
+focused on keeping you safe and secure,
+and ensuring recursive audit is available for posterity --
+but stops short of forcing updates, and never tries to sneak in "small" changes, thus never getting in the way of how you want to develop.

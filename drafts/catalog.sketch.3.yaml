@@ -1,0 +1,60 @@
+
+## variation 3!
+
+catalog:
+  name: "group.com/projectname"
+  releases:
+    "1.2.3-rawr": # the grouping is a human choice.  usually you stuff a bunch of things together if they share a semantic like same src hash, or any build steps.
+      wares:
+        "tar:QQ324WKEjnew4w9wht":
+          metadata:
+            "track-latest": "9" # android releases actually do something like this!
+            "track-1.2": "3"
+            "arch": "amd64"
+          hazards: null
+        "tar:WIg8euQ98er2uht":
+          metadata: # note that a resolver that doesn't look at arch will have a hard time choosing, here.  'E_AMBIGUOUS' will be a valid answer!
+            "track-latest": "9"
+            "track-1.2": "3"
+            "arch": "darwin"
+          hazards: null
+        "log:34t8EWU84293OIQ":
+          metadata:
+            "byproduct": true # hint that this is a log and maybe you don't need to mirror it so proactively
+              # REVIEW: 'not the main product' might be sufficiently common that it's worth blessing at the same level as 'metadata' and 'hazards'?
+      pipeline:
+        # This section is for reproduce instructions, and to provide info to enable recursive audit traversal.
+        # You could skip this section entirely if you were releasing a bunch of things without being on the repeatr bus.
+        # REVIEW: naming (always review naming...) ... "schematic" meybe?  "runRecord suite"?
+        "source":
+          incoming: "group.com/projectname-src"
+          resolvedTo: wef348g33423r
+        "compiler":
+          incoming: "ports.repeatr.io/go:1.8"
+          resolvedTo: weohuqgiuheriugh
+        "preprocess":
+          wireIn: {"/app/go": "compiler", "/task/src": "source"}
+          wireOut: {"docs": "/task/docs"}
+          conjecture: ["docs"] # or make wireOut an obj, obvi
+          runRecords:
+            # this ....... ughughhg our new challenge here is like... hej, setupHash is great, but pins the incomings without explanation
+            #  ...and now our new opinion we're exploring here is that representing the full graph is correct since the planner and the scheduler need to serialize it anyway.
+            - {uid: 1234234875234, setupHash: "2340923094weru", results:{"docs": "22938ru2983ur"}}
+            # you can have more than one list item here if you ran it repeatedly to check your repro'ability.
+            # ALTERNATELY: you could specify the same node shape twice, and add an `ENV:{"irrelevant": 2}` in order to get a unique setupHash and thus save multiple records.  Hacky.
+        # TODO finish example with more steps in the schematic and wiring terminal outputs.
+    "1.2.2":
+      wares:
+        "tar:eiruhgr":
+          metadata:
+            "semver": "1.2.2"
+            "track-latest": "8"
+            "track-1.2": "2"
+            "arch": "amd64"
+          hazards: null
+      pipeline:
+        "...": {...}
+
+# REVIEW hardcore mode:
+#  - many bits of this are losing CA-convergence properties already... we don't *have* to have that wares map keyed by ware hashes anymore if we don't want to.
+#  - so... we could actually store more than one wareID (e.g. presumably with different transmat kinds -- representing the same filesystems (otherwise would be insane)) per... thing.

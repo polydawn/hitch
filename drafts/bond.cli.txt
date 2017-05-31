@@ -1,0 +1,25 @@
+
+bond new-catalog "ports.repeatr.io/golang"
+bond release "ports.repeatr.io/golang" "1.8" "linux-amd64" "tar:WEROIUWER"
+bond release "ports.repeatr.io/golang" "1.8" "darwin-amd64" "tar:345980387"
+## These commands have also been appending a "changes.json"... which can be
+##  used to later automatically generate a commit comment.
+##  This may literally be a git commit message, but the snapshotting/commit
+##   may use some other format than git as well (and may or may not need such a message).
+
+bond commit
+## Recognizes what the storage form is (probably git, atm) and commits a snapshot.
+## Returns the ware ID of the new snapshot.
+## May run a series of "pre-commit" "hooks" first!
+##  These may generate advisories and interactive prompts.
+##  Common checks include "does not modify an existing catalog|release|selector hash", etc.
+
+bond import "ports.repeatr.io/otherprogress" --from=../remote
+## Pulls in records from another factbase.
+## Checks that they're all coherently mergable with ours, appending freely.
+## Changes are all staged; commit may be required as usual (the other repo's
+##  history is not dragged along -- and indeed, remember, since "it's not necessarily git",
+##  there might not *be* "history" like that).
+
+# TODO examples of releasing something, together with all the formulas and runrecords that made it.
+# a.k.a. the actual interesting/hard part

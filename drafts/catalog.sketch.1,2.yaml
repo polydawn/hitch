@@ -1,0 +1,115 @@
+## variation 1:
+
+catalog:
+  name: "group.com/projectname"
+  releases: # this is a set.  as always, store in sorted order.
+    "tar:awowiirjge":
+      metadata:
+        "semver": "1.2.3-rawr"
+        "track-latest": "9"
+        "track-1.2": "3"
+        "arch": "amd64"
+      hazards: null
+      buildRecords:
+        # The 'buildRecords' field is a set of commissionHash (which is setupHash + including the catalog reference names for the input wares), mapped to results.
+        # The full formula+commission objects are stored in another dir tree because they're bigish.
+        # REVIEW: we want to support storing two runRecords of the same formula to confirm repro builds, don't we?  What does it take to get that represented?
+        # REVIEW: this also seems like the area where 'conjecture' might start making sense to record.
+        "mzlvknwew":
+        "qhavlkjef":
+    "tar:eiruhgr":
+      metadata:
+        "semver": "1.2.2"
+        "track-latest": "8"
+        "track-1.2": "2"
+        "arch": "amd64"
+      hazards: null
+      buildRecords:
+        - "eroijrhut"
+        - "merihebbh"
+
+
+## variation 2:
+
+catalog:
+  name: "group.com/projectname"
+  releases:
+    "1.2.3-rawr": # the grouping is a human choice.  usually you stuff a bunch of things together if they share a semantic like same src hash, or any build steps.
+      wares:
+        "tar:awowiirjge":
+          metadata:
+            "track-latest": "9"
+            "track-1.2": "3"
+            "arch": "amd64"
+          hazards: null
+        "tar:bw4jigjijr3":
+          metadata: # note that a resolver that doesn't look at arch will have a hard time choosing, here.  'E_AMBIGUOUS' will be a valid answer!
+            "track-latest": "9"
+            "track-1.2": "3"
+            "arch": "darwin"
+          hazards: null
+      runRecords:
+        # The 'runRecords' set contains as many records as the release author desired, keyed by runRecordHID (which is effectively a UID, since it includes timestamps).
+        # is a set of commissionHash (which is setupHash + including the catalog reference names for the input wares), mapped to results.
+        # The full runRecords objects (and the formula+commission info that's a subset of them) are stored in another dir tree because they're bigish.
+        #
+        # Operations you can perform with this information:
+        #  - Check that the wares in the release are results (!).  (A factbase maintainer would have this as an admissability predicate.)
+        #  - Look up all wares that come from the great outdoors, and enumerate their catalog reference names (`{catalogName,releaseName,wareID}` tuple).
+        #    - Check that all of those are free of hazard warnings.
+        #    - You can now recurse on their runRecords!
+        #  - Results here may also contain the "shouldReproduce:true" flag, which, if set, you may verify by running the formula again.
+        #
+        # The use of full runRecordHID, including timestamp, is necessary because we want to support
+        # storing two runRecords of the same setupHash to so we can represent evidence of repro builds.
+        #
+        # Operations you notably *can't* perform:
+        #  - You can't really answer *why* the particular wares selected from other catalogs were selected,
+        #    or why this particular group of formulas was stamped out like this.
+        #    You also can't really tell if everything used is "the newest" that's acceptable.
+        #    (You would need to know what templater/updater/whatsit was used, and the pre-pinned half-baked formulas used.)
+        #    But this is **okay**.  You only need to know that they're free of hazards.
+        #
+        # REVIEW: food for thought, that.  We could add another field that's for pinning the formula that ran your templater.  Optional, of course.  But neat.
+        #
+        # Additional formulas and runRecords that do not have any results that end up in the release wares may also be referenced.
+        # This is often used to record formulas that ran integration and acceptance tests that were part of the releaser's QA decision making process.
+        #
+
+        "nwihuuqzz": {
+            commision: {setupHash:"geuhwklks", inputCatalogs:{"/app/go": "ports.repeatr.io/go:1.8", "/src": "group.com/projectname-src"},
+            shouldReproduce: ["/build"]
+            runRecords: [
+                # If there's more than one of these, it's a repro attestation.
+                # The only reason this needs special treatment instead of just being two rows is to save an active checker from running repro twice.
+                # ... But a sane checker should be able to either figure that our or brainlessly noop/memoize that anyway, so on second thought, what's the point?
+                # Saving on the repeat serialization of the other commissionery info and the shouldReproduce section, I guess.
+                # REVIEW: this ^
+                {ts:1242534, exitcode:0, results:{"/build": "tar:awowiirjge", "/task/log": "tar:oi34ghu55ht"}}
+                {ts:1332583, exitcode:0, results:{"/build": "tar:awowiirjge", "/task/log": "tar:ijouthriejw"}}
+            ]
+        }
+        # REVIEW: is "ports.repeatr.io/go" -- the catalogName -- enough?  or should it include the releaseName as well?
+        # It gets a little ridiculous if you think of git repos as a source, tbh.  The releaseName would basically be the full commit hash again.
+        # Maybe we just don't do git repos like that.  After all, this logging is for releases.  Your CI can use a git hash without justification.
+
+        # This next one is the hypothetical mac build.
+        # Note how we don't specify whether the go compiler is the mac or linux builds: this is pinned though; it's included in the setupHash.
+        #  (You have to use the setup hash to look up the formula, read that, and then join the input hashes there against the {catalogName,releaseName} here to get the full path to a thing with metadata back again.)
+        "qhavlkjef": {ts:1242534, setupHash:"eroijhtuh", inputCatalogs:{"/app/go": "ports.repeatr.io/go:1.8", "/src": "group.com/projectname-src"}, exitcode:0, results:{"/build": "tar:bw4jigjijr3"}}
+    "1.2.2":
+      wares:
+        "tar:eiruhgr":
+          metadata:
+            "semver": "1.2.2"
+            "track-latest": "8"
+            "track-1.2": "2"
+            "arch": "amd64"
+          hazards: null
+        runRecords:
+          "...": {...}
+
+# a strong argument for this layout:
+#   - 'hazards' are *definitely* per wareID in a catalog.
+#      It's vaguely conceivable that the same wareID in two different catalogs might be labled a hazard in one, and still considered safe in another.  But not within a catalog!
+#      - You could make the same argument about the entire release, actually.  Hm.

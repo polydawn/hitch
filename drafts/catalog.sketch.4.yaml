@@ -1,0 +1,41 @@
+catalog: "teamgroup.org/project/src"
+releases:
+  - "0.1"
+    wares:
+      "source": "git:23fe289dd2"
+      "sig": "file:XDs4eeFHYCV9uI"
+    metadata:
+      "track-latest": "1"
+    hazards: null
+  - "0.2"
+    wares:
+      "source": "git:6394aab93"
+      "sig": "file:sEj4kwI4GjoklQ"
+    metadata:
+      "track-latest": "2"
+    hazards: null
+warehouses:
+  "git":
+    - "https://github.com/teamgroup/project"
+
+---
+
+catalog: "teamgroup.org/project"
+releases:
+  - "0.1"
+    wares:
+      "linux-amd64": "tar:QQ324WKEjnew4w9wht"
+      "darwin-amd64": "tar:WIg8euQ98er2uht"
+      "assets": "tar:WeghwIkqnvlky4593j"
+      "docs": "tar:34t8EWU84293OIQ"
+    metadata:
+      "track-latest": "1"
+
+---
+
+### It's unfortunate that by putting names in the list here... (why is that a list?)...
+###  We've got the problem mdm had again, don't we?
+###  Our *UI itself* needs a defacto way to sort these.  And people can't be trusted to make their things sort like semver strings (obviously)...
+###  ... and people can't be trusted not to want to *change their minds* about those strings.
+### The crux is this: if you want to look up whether something is a hazard, and someone changed that name, you shouldn't fail.  But you will.
+### I don't actually know if there's a solution to this given some of the core n-to-1's smattered around, unless we just get all denial-y about them.

@@ -44,5 +44,5 @@ type Replay struct {
 		CommissionName CommissionName
 		OutputSlot     rdef.AbsPath
 	}
-	RunRecords map[*rdef.RunRecord]struct{} // runRecords map themselves back to SetupHash, so this is just a bag.  It is forbidden to have runrecords that a product or intermediate wire point to must... wait.
+	RunRecords map[CommissionName]map[rdef.RunRecordHash]*rdef.RunRecord // runRecords are stored indexed per step.  It is forbidden to have two runrecords for the same step with conflicting outputs IFF that output slot is referenced by either the final Products or any intermediate Wire.
 }

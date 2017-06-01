@@ -39,5 +39,10 @@ type ReleaseEntry struct {
 }
 
 type Replay struct {
-	// TODO
+	Computations map[CommissionName]Commission // review: this could still be `map[StepName]rdef.SetupHash`, because reminder, we're not a planner; this is replay not pipeline.
+	Products     map[ItemLabel]struct {        // n.b. since this is final outputs only, implied here is commissions can also use an input "wire:<commissionName>:<outputPath>" for intermediates.
+		CommissionName CommissionName
+		OutputSlot     rdef.AbsPath
+	}
+	RunRecords map[*rdef.RunRecord]struct{} // runRecords map themselves back to SetupHash, so this is just a bag.  It is forbidden to have runrecords that a product or intermediate wire point to must... wait.
 }

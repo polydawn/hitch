@@ -38,6 +38,10 @@ type ReleaseEntry struct {
 	Replay   *Replay
 }
 
+type CommissionName string
+type Commission interface { /* it's a formula without pinned inputs */
+}
+
 type Replay struct {
 	Computations map[CommissionName]Commission // review: this could still be `map[StepName]rdef.SetupHash`, because reminder, we're not a planner; this is replay not pipeline.
 	Products     map[ItemLabel]struct {        // n.b. since this is final outputs only, implied here is commissions can also use an input "wire:<commissionName>:<outputPath>" for intermediates.
@@ -45,4 +49,58 @@ type Replay struct {
 		OutputSlot     rdef.AbsPath
 	}
 	RunRecords map[CommissionName]map[rdef.RunRecordHash]*rdef.RunRecord // runRecords are stored indexed per step.  It is forbidden to have two runrecords for the same step with conflicting outputs IFF that output slot is referenced by either the final Products or any intermediate Wire.
+}
+
+var example = Replay{
+	Computations: map[CommissionName]Commission{
+		"prepare-step": map[string]interface{}{
+			"inputs": map[rdef.AbsPath]interface{}{
+				// remember, this is already thoroughly resolved: these infos are for your recursive lookup clarity.
+				"/":         "hub.repeatr.io/base:2017-05-01:linux-amd64",
+				"/task/src": "team.net/theproj:2.1.1:src",
+			},
+			"action": nil, // ... some preprocessor step, whatever ...
+			"outputs": map[rdef.AbsPath]interface{}{
+				"/task/output/docs": "tar",
+				"/task/output/src":  "tar",
+			},
+		},
+		"build-linux": map[string]interface{}{
+			"inputs": map[rdef.AbsPath]interface{}{
+				"/":            "hub.repeatr.io/base:2017-05-01:linux-amd64",
+				"/app/compilr": "hub.repeatr.io/compilr:1.8:linux-amd64",
+				"/task/src":    "wire:prepare-step:/task/output/src",
+			},
+			"action": nil, // ... some compiler is invoked ...
+			"outputs": map[rdef.AbsPath]interface{}{
+				"/task/output": "tar",
+				"/task/logs":   "tar", // this is a byproduct (implicit: no products point at it).
+			},
+		},
+	},
+	Products: map[ItemLabel]struct {
+		CommissionName CommissionName
+		OutputSlot     rdef.AbsPath
+	}{
+		"src":         {"prepare-step", "/task/output/src"},
+		"docs":        {"prepare-step", "/task/output/docs"},
+		"linux-amd64": {"build-linux", "/task/output"},
+	},
+	RunRecords: map[CommissionName]map[rdef.RunRecordHash]*rdef.RunRecord{
+		"prepare-step": map[rdef.RunRecordHash]*rdef.RunRecord{
+			"aasdfasdf": &rdef.RunRecord{
+				UID:       "234852-23792",
+				Time:      23495,
+				FormulaID: "oeiru43t", // Matches what happens when you put the inputs named in the commission together... but not currently otherwise explicitly mentioned.
+				Results: map[rdef.AbsPath]rdef.WareID{
+					"/task/output/docs": "tar:387ty874yt",
+					"/task/output/src":  "tar:egruihieur",
+				},
+			},
+		},
+		// ... same for the other commissions.
+	},
+	// Implicitly now -- For this release record:
+	//   - Items["src"] = "tar:egruihieur" -- this much match; correct doc format verifies this: the item label matches the products map, points to the commision name, has a runrecord, which has this wareID.
+	//   - ... and the other items similarly.
 }

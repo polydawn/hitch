@@ -4,6 +4,24 @@ import (
 	"polydawn.net/hitch/api/rdef"
 )
 
+/*
+	Release names come in three parts:
+	the Catalog Name, the Release Name, and the Item Label.
+
+	The catalog is a whole group of releases for a single project.
+	For example, there's a "repeatr" releases catalog.
+
+	The release name is a string attached to the release;
+	it's specified by the releaser when creating a new release.
+
+	The item label is a selector used to select a specific ware when there is
+	more than one ware published in a single atomic release.
+	The set of items in a release is considered immutable once the release is published.
+	Generally, there's an expectation the ecosystem that the set of item labels available
+	from each release will be the same: e.g., when upgrading from an older version
+	of repeatr, one might expect to jump from "repeatr.io/repeatr:1.0:linux-amd64"
+	to "repeatr.io/repeatr:1.1:linux-amd64".
+*/
 type (
 	CatalogName string // oft like "project.org/thing".  The first part of an identifying triple.
 	ReleaseName string // oft like "1.8".  The second part of an identifying triple.

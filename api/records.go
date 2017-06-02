@@ -137,6 +137,32 @@ type Step struct {
 	RunRecords map[rdef.RunRecordHash]*rdef.RunRecord
 }
 
+/*
+	A note on storage (on filesystem):
+
+		./{catalogName}/catalog.json
+		./{catalogName}/replay/{releaseName}/replay.json
+		./{catalogName}/replay/{releaseName}/{stepName-1}.formula
+		./{catalogName}/replay/{releaseName}/{stepName-2}.formula
+		./{catalogName}/tracks.json # optional; this is an extension
+
+	Why like this?
+
+		- Every catalog deserves its own dir; goes without saying.
+		- 'catalog.json' is just about the facts; just names and content.
+		- 'replay/*', though we certainly hope you're using repeatr, is
+		   full of repeatr opinions.  ('catalog.json' isn't, aside from WareIDs.)
+		- Formulas *get their own file* under the replay dirs, so you can easily
+		   *directly* `repeatr run` those again, even without the rest of hitch.
+		- The path to formulas is entirely human names, so you can tabcomplete to
+		   something that's of interest to you.
+		- Extensions like "tracks" (an alternative to semver) store their data
+		   off to the side; they can reference <Catalog,Release,Item> tuples clearly.
+
+	Todo: runrecord storage not yet shown here.  Pick that (see also review
+	comments in the example, below).
+*/
+
 var example = Replay{
 	Steps: map[StepName]Step{
 		"prepare-step": Step{

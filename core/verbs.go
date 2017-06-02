@@ -20,3 +20,14 @@ func (x *ReleaseEntryBuilder) AppendStep(
 ) {
 
 }
+
+/*
+	Call Verify or MustVerify to check the connectedness of all steps in the entry so far.
+
+	Calling this after every append is possible if you know you're streaming in
+	records in the same order they were built, but it's equally valid to append
+	an unordered set of records and then call verify once at the end.
+*/
+func (x *ReleaseEntryBuilder) MustVerify() {
+
+}

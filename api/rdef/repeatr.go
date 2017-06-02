@@ -35,3 +35,5 @@ type RunRecord struct {
 }
 
 type RunRecordHash string // HID of RunRecord.  Includes UID, etc, so quite unique.  Prefer this to UID for primary key in storage (it's collision resistant).
+
+type Formula interface{} // TODO bother to finish fleshing this back out

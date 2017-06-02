@@ -9,14 +9,10 @@ type ReleaseEntryBuilder struct {
 }
 
 func (x *ReleaseEntryBuilder) AppendStep(
-	name api.CommissionName,
-	upstream map[*rdef.AbsPath]struct { // must onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
-		api.CatalogName
-		api.ReleaseName
-		api.ItemLabel
-	},
-	formula interface{}, // yes, with hashes.  these HAD BETTER match the upstreams if you check it, but, if upstreams mutate, then, well, that's why we vendored it here.
-	runRecord *rdef.RunRecord,
+	name api.StepName,
+	upstream map[*rdef.AbsPath]api.ReleaseItemID, // must onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
+	formula *rdef.Formula, // yes, with hashes.  these HAD BETTER match the upstreams if you check it, but, if upstreams mutate, then, well, that's why we vendored it here.
+	runRecord *rdef.RunRecord, // REVIEW maybe append these separately; verify checks if any step has zero runrecords at end.
 ) {
 
 }

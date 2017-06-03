@@ -137,6 +137,20 @@ type Step struct {
 	// that *aren't* so referenced; an output slot which captures logs, for example,
 	// may often differ between runs, but since it's not passed forward, so be it.)
 	RunRecords map[rdef.RunRecordHash]*rdef.RunRecord
+
+	// FUTURE/REVIEW: we may want to include a concept of "checkpoints":
+	// they're named in the same space as steps using formulas,
+	// and can be wired roughly the same way...
+	// but take a single input wire,
+	// and some other step names from which it only collects exit codes,
+	// and the checkpoint itself does not need a formula or runrecords.
+	// The checkpoint is only considered done when all the other named steps have
+	// exited success, and thus can be used to gate flow based on tests in other formulas.
+	// You could emulate this with dummy formulas, but
+	// Checkpoints just happen to not need execution of a formula themself,
+	// and only have a single output ware (which is coincidentally also the input ware),
+	// and so benefit from some directness and simplification.
+	// They would also be appropriate to highlight slightly differently in a UI.
 }
 
 /*
@@ -257,9 +271,3 @@ var example = Replay{
 	//   - Items["src"] = "tar:egruihieur" -- this much match; correct doc format verifies this: the item label matches the products map, points to the step name, has a runrecord, which has this wareID.
 	//   - ... and the other items similarly.
 }
-
-// checkpoints: they're named in the same space as commissions, can be wired the same way, they just happen to not need execution of a formula and only have a single output ware (which is coincidentally also the input ware).
-
-// split the computations upstream parts, per matching the verbs file.
-
-// define all these types with full structy goodness; write test structs with primitives and test json roundtrip against them to keep our schema adhered to the ground.

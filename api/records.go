@@ -1,6 +1,10 @@
 package api
 
 import (
+	"strings"
+
+	"github.com/polydawn/refmt/obj/atlas"
+
 	"polydawn.net/hitch/api/rdef"
 )
 
@@ -33,6 +37,18 @@ type ReleaseItemID struct {
 	ReleaseName
 	ItemLabel
 }
+
+var ReleaseItemID_AtlasEntry = atlas.BuildEntry(ReleaseItemID{}).Transform().
+	TransformMarshal(atlas.MakeMarshalTransformFunc(
+		func(x ReleaseItemID) (string, error) {
+			return string(x.CatalogName) + ":" + string(x.ReleaseName) + ":" + string(x.ItemLabel), nil
+		})).
+	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
+		func(x string) (ReleaseItemID, error) {
+			ss := strings.Split(x, ":")
+			return ReleaseItemID{CatalogName(ss[0]), ReleaseName(ss[1]), ItemLabel(ss[2])}, nil
+		})).
+	Complete()
 
 /*
 	A Catalog is the accumulated releases for a particular piece of software.

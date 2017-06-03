@@ -72,16 +72,18 @@ type Replay struct {
 	// Map wiring the ItemLabels in the release outputs to a step and output slot
 	// within that step's formula.
 	//
+	// Implicitly, all the ReleaseItemID's tend to be of "wire" type.
+	// (It's rare, but valid, for the Products map to point directly to other
+	// catalogs.  This feature can be used for example to make a personal catalog
+	// which releases already-published-elsewhere content, but with different metadata.)
+	//
 	// As with "wire" mode in a Step's Imports, if the referenced step has more than
 	// one RunRecord, then the wired output slot MUST have resulted in the same WareID
 	// hash all the RunRecords.
 	// Furthermore, the WareID in those RunRecords must match the WareID which
 	// is directly listed for the ItemLabel in the the release entry; otherwise,
 	// the replay isn't describing the same thing released!
-	Products map[ItemLabel]struct {
-		StepName   StepName
-		OutputSlot rdef.AbsPath
-	}
+	Products map[ItemLabel]ReleaseItemID
 }
 
 type StepName string
@@ -246,13 +248,10 @@ var example = Replay{
 		},
 		// and then you might imagine a "build-mac" step here as well, etc...
 	},
-	Products: map[ItemLabel]struct {
-		StepName   StepName
-		OutputSlot rdef.AbsPath
-	}{
-		"src":         {"prepare-step", "/task/output/src"},
-		"docs":        {"prepare-step", "/task/output/docs"},
-		"linux-amd64": {"build-linux", "/task/output"},
+	Products: map[ItemLabel]ReleaseItemID{
+		"src":         {"wire", "prepare-step", "/task/output/src"},
+		"docs":        {"wire", "prepare-step", "/task/output/docs"},
+		"linux-amd64": {"wire", "build-linux", "/task/output"},
 	},
 	// Implicitly now -- For this release record:
 	//   - Items["src"] = "tar:egruihieur" -- this much match; correct doc format verifies this: the item label matches the products map, points to the step name, has a runrecord, which has this wareID.

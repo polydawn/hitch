@@ -77,7 +77,7 @@ type ReleaseEntry struct {
 	Items    map[ItemLabel]rdef.WareID
 	Metadata map[string]string
 	Hazards  map[string]string
-	Replay   *Replay
+	Replay   interface{} // FIXME '*Replay' but snipping here temporarily while extending serialization
 }
 
 var ReleaseEntry_AtlasEntry = atlas.BuildEntry(ReleaseEntry{}).StructMap().Autogenerate().Complete()

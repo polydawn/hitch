@@ -70,6 +70,8 @@ type Catalog struct {
 	Releases []ReleaseEntry
 }
 
+var Catalog_AtlasEntry = atlas.BuildEntry(Catalog{}).StructMap().Autogenerate().Complete()
+
 type ReleaseEntry struct {
 	Name     ReleaseName
 	Items    map[ItemLabel]rdef.WareID
@@ -77,6 +79,8 @@ type ReleaseEntry struct {
 	Hazards  map[string]string
 	Replay   *Replay
 }
+
+var ReleaseEntry_AtlasEntry = atlas.BuildEntry(ReleaseEntry{}).StructMap().Autogenerate().Complete()
 
 type Replay struct {
 	// The set of steps recorded in this replay.

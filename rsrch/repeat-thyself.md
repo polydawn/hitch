@@ -94,7 +94,8 @@ EOF > "$target/build.formula"
 ```bash
 hitch start-release "repeatr.io/repeatr:$1"
 
-# TODO guess we should be able to both release and refer to our own source, shouldn't we?
+# Label the source version itself.
+hitch add labels "repeatr.io/repeatr:$1:src" "$WARE_SRC"
 
 for target in linux-amd64 darwin-amd64; do {
 	# Run again!
@@ -102,6 +103,9 @@ for target in linux-amd64 darwin-amd64; do {
 
 	# Check reproducibility.  (Hitch would do this while validating the release too.)
 	repeatr munge runrecords --check-equality="/task/bin" "$target"/runrecord-{1,2}.json
+
+	# Sneak in the reference to this selfsame release as the explanation for the git source hash.
+	cat '"/task": "repeatr.io/repeatr:$1:src"' >> "$target"/import-labels.yaml
 
 	# Add the step (giving it a name), attach the runrecords, and label the final product.
 	hitch add step "build-$target" "$target"/build.formula "$target"/import-labels.yaml

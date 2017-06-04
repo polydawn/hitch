@@ -109,5 +109,13 @@ for target in linux-amd64 darwin-amd64; do {
 	hitch add labels "$target" "wire:build-$target:/task/bin"
 }; done
 
+# Tell hitch we're done.  It validates everything:
+#  - checks that all steps have at least one runrecord
+#  - checks that all labels and wires refer to results of a step (e.g., no dangling names) (and if there's more than one runrecord for a step, that the results are identical)
+#  - checks that all imports can be found in the hitch factbase or those wires to other steps (and resolving those to hashes matches what's actually pinned in the formulas)
+#  - warns you if any inputs don't have import explanations
+# and ends by emitting a WareID of what the entire factbase would be if you saved it now.
+# (If you were running all these hitch commands in a container themself, and had
+# the hitch state files path as an output, you would get the same wareID.)
 hitch commit
 ```

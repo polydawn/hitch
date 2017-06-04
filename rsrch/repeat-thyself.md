@@ -66,11 +66,9 @@ for target in linux-amd64 darwin-amd64; do {
 	mkdir "$target"
 
 	cat <<EOF
-		{
-			"/":       "$RELEASEID_BASE",
-			"/app/go": "$RELEASEID_GO",
-		}
-EOF > "$target/import-labels.json"
+		"/":       "$RELEASEID_BASE"
+		"/app/go": "$RELEASEID_GO"
+EOF > "$target/import-labels.yaml"
 
 	cat <<EOF
 		inputs:

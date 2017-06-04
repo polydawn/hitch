@@ -65,11 +65,14 @@ WARE_SRC="git:"`git rev-parse HEAD`
 for target in linux-amd64 darwin-amd64; do {
 	mkdir "$target"
 
+	# Stamp out record of which labels match our inputs.
+	# This is entirely for hitch's consumption when releasing.
 	cat <<EOF
 		"/":       "$RELEASEID_BASE"
 		"/app/go": "$RELEASEID_GO"
 EOF > "$target/import-labels.yaml"
 
+	# Stamp out formula.  We'll invoke this momentarily.
 	cat <<EOF
 		inputs:
 			"/":        "$WARE_BASE"
@@ -81,10 +84,30 @@ EOF > "$target/import-labels.yaml"
 			"/task/bin/": "tar"
 EOF > "$target/build.formula"
 
-	# ...
+	# Run!
+	repeatr run "$target/build.formula" > "$target/runrecord-1.json"
 }; done
 ```
 
 ### rebuild, check, & release
 
-// todo
+```bash
+hitch start-release "repeatr.io/repeatr:$1"
+
+# TODO guess we should be able to both release and refer to our own source, shouldn't we?
+
+for target in linux-amd64 darwin-amd64; do {
+	# Run again!
+	repeatr run "$target/build.formula" > "$target/runrecord-2.json"
+
+	# Check reproducibility.  (Hitch would do this while validating the release too.)
+	repeatr munge runrecords --check-equality="/task/bin" "$target"/runrecord-{1,2}.json
+
+	# Add the step (giving it a name), attach the runrecords, and label the final product.
+	hitch add step "build-$target" "$target"/build.formula "$target"/import-labels.yaml
+	hitch add runrecords "build-$target" -- "$target"/runrecord-*.json
+	hitch add labels "$target" "wire:build-$target:/task/bin"
+}; done
+
+hitch commit
+```

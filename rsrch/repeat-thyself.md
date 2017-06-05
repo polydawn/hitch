@@ -84,6 +84,10 @@ EOF > "$target/import-labels.yaml"
 			"/task/bin/": "tar"
 EOF > "$target/build.formula"
 
+	# ... TODO kinda seems like you need to generate the warehouse URL file here too!
+	# which is the n'th place the releaseID shows up again.  maybe we do want a standard file for that?
+	# The question is whether a standard file for that is hitch's demesne or a planner tool's.
+
 	# Run!
 	repeatr run "$target/build.formula" > "$target/runrecord-1.json"
 }; done

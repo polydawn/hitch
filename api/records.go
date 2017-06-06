@@ -77,7 +77,7 @@ type ReleaseEntry struct {
 	Items    map[ItemLabel]rdef.WareID
 	Metadata map[string]string
 	Hazards  map[string]string
-	Replay   interface{} // FIXME '*Replay' but snipping here temporarily while extending serialization
+	Replay   *Replay
 }
 
 var ReleaseEntry_AtlasEntry = atlas.BuildEntry(ReleaseEntry{}).StructMap().Autogenerate().Complete()
@@ -105,6 +105,8 @@ type Replay struct {
 	// the replay isn't describing the same thing released!
 	Products map[ItemLabel]ReleaseItemID
 }
+
+var Replay_AtlasEntry = atlas.BuildEntry(Replay{}).StructMap().Autogenerate().Complete()
 
 type StepName string
 type Step struct {
@@ -172,6 +174,8 @@ type Step struct {
 	// and so benefit from some directness and simplification.
 	// They would also be appropriate to highlight slightly differently in a UI.
 }
+
+var Step_AtlasEntry = atlas.BuildEntry(Step{}).StructMap().Autogenerate().Complete()
 
 /*
 	A note on storage (on filesystem):

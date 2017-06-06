@@ -17,6 +17,8 @@ func TestSerial(t *testing.T) {
 		ReleaseItemID_AtlasEntry,
 		Catalog_AtlasEntry,
 		ReleaseEntry_AtlasEntry,
+		Replay_AtlasEntry,
+		Step_AtlasEntry,
 	)
 	Convey("ReleaseItemID serialization", t, func() {
 		msg, err := refmt.JsonEncodeAtlased(atl,

@@ -1,6 +1,10 @@
 package api
 
 import (
+	"strings"
+
+	"github.com/polydawn/refmt/obj/atlas"
+
 	"polydawn.net/hitch/api/rdef"
 )
 
@@ -34,6 +38,18 @@ type ReleaseItemID struct {
 	ItemLabel
 }
 
+var ReleaseItemID_AtlasEntry = atlas.BuildEntry(ReleaseItemID{}).Transform().
+	TransformMarshal(atlas.MakeMarshalTransformFunc(
+		func(x ReleaseItemID) (string, error) {
+			return string(x.CatalogName) + ":" + string(x.ReleaseName) + ":" + string(x.ItemLabel), nil
+		})).
+	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
+		func(x string) (ReleaseItemID, error) {
+			ss := strings.Split(x, ":")
+			return ReleaseItemID{CatalogName(ss[0]), ReleaseName(ss[1]), ItemLabel(ss[2])}, nil
+		})).
+	Complete()
+
 /*
 	A Catalog is the accumulated releases for a particular piece of software.
 
@@ -54,6 +70,8 @@ type Catalog struct {
 	Releases []ReleaseEntry
 }
 
+var Catalog_AtlasEntry = atlas.BuildEntry(Catalog{}).StructMap().Autogenerate().Complete()
+
 type ReleaseEntry struct {
 	Name     ReleaseName
 	Items    map[ItemLabel]rdef.WareID
@@ -61,6 +79,8 @@ type ReleaseEntry struct {
 	Hazards  map[string]string
 	Replay   *Replay
 }
+
+var ReleaseEntry_AtlasEntry = atlas.BuildEntry(ReleaseEntry{}).StructMap().Autogenerate().Complete()
 
 type Replay struct {
 	// The set of steps recorded in this replay.
@@ -85,6 +105,8 @@ type Replay struct {
 	// the replay isn't describing the same thing released!
 	Products map[ItemLabel]ReleaseItemID
 }
+
+var Replay_AtlasEntry = atlas.BuildEntry(Replay{}).StructMap().Autogenerate().Complete()
 
 type StepName string
 type Step struct {
@@ -153,6 +175,8 @@ type Step struct {
 	// They would also be appropriate to highlight slightly differently in a UI.
 }
 
+var Step_AtlasEntry = atlas.BuildEntry(Step{}).StructMap().Autogenerate().Complete()
+
 /*
 	A note on storage (on filesystem):
 
@@ -178,96 +202,3 @@ type Step struct {
 	Todo: runrecord storage not yet shown here.  Pick that (see also review
 	comments in the example, below).
 */
-
-var example = Replay{
-	Steps: map[StepName]Step{
-		"prepare-step": Step{
-			Imports: map[rdef.AbsPath]ReleaseItemID{
-				// Given the same snapshot of all relevant Catalogs, this section
-				// should be sufficient to reproduce the Formula.Inputs.
-				//
-				// Remember, this is already thoroughly resolved: these infos are
-				// for recursive lookup clarity.
-				// The concept of "updating" lies somewhere outside of our demesne.
-				"/":         {"hub.repeatr.io/base", "2017-05-01", "linux-amd64"},
-				"/task/src": {"team.net/theproj", "2.1.1", "src"},
-			},
-			Formula: map[string]interface{}{
-				"inputs": map[rdef.AbsPath]string{
-					"/":         "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
-					"/task/src": "git:e730adbee91e5584b12dd4cb438673785034ecbe",
-				},
-				"action": nil, // ... some preprocessor step, whatever ...
-				"outputs": map[rdef.AbsPath]interface{}{
-					"/task/output/docs": "tar",
-					"/task/output/src":  "tar",
-				},
-			},
-			RunRecords: map[rdef.RunRecordHash]*rdef.RunRecord{
-				"349h34tq34r9p8u": &rdef.RunRecord{
-					UID:       "234852-23792",
-					Time:      23495,
-					FormulaID: "oeiru43t3ijjrieqo", // somewhat redundantly, the SetupHash of the above formula.
-					Results: map[rdef.AbsPath]rdef.WareID{
-						"/task/output/docs": "tar:387ty874yt",
-						"/task/output/src":  "tar:egruihieur",
-					},
-				},
-				// REVIEW.  A valid alternative way to do this would be putting the
-				// blessed set of results here (e.g. only what's picked up by wires),
-				// and listing a set of RunRecordHashes that back it up, but storing
-				// them very far away (not specific to this step at all).
-				// Doing so would mean runrecords aren't stored in "why" order on disk,
-				// but would also more closely match how any memoizer tends to see things.
-			},
-		},
-		"build-linux": Step{
-			Imports: map[rdef.AbsPath]ReleaseItemID{
-				"/":            {"hub.repeatr.io/base", "2017-05-01", "linux-amd64"},
-				"/app/compilr": {"hub.repeatr.io/compilr", "1.8", "linux-amd64"},
-				"/task/src":    {"wire", "prepare-step", "/task/output/src"},
-			},
-			Formula: map[string]interface{}{
-				"inputs": map[rdef.AbsPath]string{
-					"/":                "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
-					"/app/compilr":     "tar:jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva",
-					"/task/output/src": "tar:egruihieur",
-				},
-				"action": nil, // ... some compiler is invoked ...
-				"outputs": map[rdef.AbsPath]interface{}{
-					"/task/output": "tar",
-					"/task/logs":   "tar", // this is a byproduct (implicit: no products point at it).
-				},
-			},
-			RunRecords: map[rdef.RunRecordHash]*rdef.RunRecord{
-				"zjklalkjn": &rdef.RunRecord{
-					UID:       "21552-2456792",
-					Time:      23499,
-					FormulaID: "h23hsfiuh48svi",
-					Results: map[rdef.AbsPath]rdef.WareID{
-						"/task/output": "tar:ooijpwoeijgwer",
-						"/task/logs":   "tar:34t983hheiufrt",
-					},
-				},
-				"krljthklj": &rdef.RunRecord{
-					UID:       "23456-2456792",
-					Time:      23456,
-					FormulaID: "h23hsfiuh48svi",
-					Results: map[rdef.AbsPath]rdef.WareID{
-						"/task/output": "tar:ooijpwoeijgwer",
-						"/task/logs":   "tar:poi23459268034",
-					},
-				},
-			},
-		},
-		// and then you might imagine a "build-mac" step here as well, etc...
-	},
-	Products: map[ItemLabel]ReleaseItemID{
-		"src":         {"wire", "prepare-step", "/task/output/src"},
-		"docs":        {"wire", "prepare-step", "/task/output/docs"},
-		"linux-amd64": {"wire", "build-linux", "/task/output"},
-	},
-	// Implicitly now -- For this release record:
-	//   - Items["src"] = "tar:egruihieur" -- this much match; correct doc format verifies this: the item label matches the products map, points to the step name, has a runrecord, which has this wareID.
-	//   - ... and the other items similarly.
-}

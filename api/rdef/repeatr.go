@@ -7,6 +7,10 @@
 */
 package rdef
 
+import (
+	"github.com/polydawn/refmt/obj/atlas"
+)
+
 /*
 	Ware IDs are content-addressable, cryptographic hashes which uniquely identify
 	a "ware" -- a packed filesystem snapshot.
@@ -33,6 +37,8 @@ type RunRecord struct {
 	Hostname string            // hostname.  not a trusted field, but useful for debugging.
 	Metadata map[string]string // escape valve.  you can attach freetext here.
 }
+
+var RunRecord_AtlasEntry = atlas.BuildEntry(RunRecord{}).StructMap().Autogenerate().Complete()
 
 type RunRecordHash string // HID of RunRecord.  Includes UID, etc, so quite unique.  Prefer this to UID for primary key in storage (it's collision resistant).
 

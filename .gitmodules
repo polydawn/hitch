@@ -10,3 +10,12 @@
 [submodule ".gopath/src/github.com/polydawn/refmt"]
 	path = .gopath/src/github.com/polydawn/refmt
 	url = https://github.com/polydawn/refmt
+[submodule ".gopath/src/github.com/alecthomas/units"]
+	path = .gopath/src/github.com/alecthomas/units
+	url = https://github.com/alecthomas/units
+[submodule ".gopath/src/github.com/alecthomas/template"]
+	path = .gopath/src/github.com/alecthomas/template
+	url = https://github.com/alecthomas/template
+[submodule ".gopath/src/gopkg.in/alecthomas/kingpin.v2"]
+	path = .gopath/src/gopkg.in/alecthomas/kingpin.v2
+	url = https://gopkg.in/alecthomas/kingpin.v2

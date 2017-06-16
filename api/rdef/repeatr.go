@@ -50,14 +50,28 @@ type (
 
 	FormulaInputs map[AbsPath]WareID
 
-	FormulaAction interface{} // TODO flesh this back out
-
 	FormulaOutputs map[AbsPath]string // TODO probably need more there than the ware type name ... although we could put normalizers in the "action" section
+
+	/*
+		Defines the action to perform to evaluate the formula -- some commands
+		or filesystem operations which will be run after the inputs have been
+		assembled; the action is done, the outputs will be saved.
+	*/
+	FormulaAction struct {
+		// An array of strings to hand as args to exec -- creates a single process.
+		//
+		// TODO we want to add a polymorphic option here, e.g.
+		// one of 'Exec', 'Script', or 'Reshuffle' may be set.
+		Exec []string
+	}
 
 	SetupHash string // HID of formula
 )
 
-var Formula_AtlasEntry = atlas.BuildEntry(Formula{}).StructMap().Autogenerate().Complete()
+var (
+	Formula_AtlasEntry       = atlas.BuildEntry(Formula{}).StructMap().Autogenerate().Complete()
+	FormulaAction_AtlasEntry = atlas.BuildEntry(FormulaAction{}).StructMap().Autogenerate().Complete()
+)
 
 type RunRecord struct {
 	UID       string             // random number, presumed globally unique.

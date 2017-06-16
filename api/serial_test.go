@@ -21,6 +21,7 @@ func TestSerial(t *testing.T) {
 		Replay_AtlasEntry,
 		Step_AtlasEntry,
 		rdef.Formula_AtlasEntry,
+		rdef.FormulaAction_AtlasEntry,
 		rdef.RunRecord_AtlasEntry,
 	)
 	Convey("ReleaseItemID serialization", t, func() {
@@ -112,7 +113,9 @@ func TestSerial(t *testing.T) {
 												"/":         {"tar", "aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT"},
 												"/task/src": {"git", "e730adbee91e5584b12dd4cb438673785034ecbe"},
 											},
-											//Action: nil, // ... some preprocessor step, whatever ...
+											Action: rdef.FormulaAction{
+												Exec: []string{"somecommand"},
+											},
 											Outputs: map[rdef.AbsPath]string{
 												"/task/output/docs": "tar",
 												"/task/output/src":  "tar",
@@ -148,7 +151,9 @@ func TestSerial(t *testing.T) {
 												"/app/compilr":     {"tar", "jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva"},
 												"/task/output/src": {"tar", "egruihieur"},
 											},
-											//Action: nil, // ... some compiler is invoked ...
+											Action: rdef.FormulaAction{
+												Exec: []string{"build-cmd", "args"},
+											},
 											Outputs: map[rdef.AbsPath]string{
 												"/task/output": "tar",
 												"/task/logs":   "tar", // this is a byproduct (implicit: no products point at it).
@@ -229,7 +234,12 @@ func TestSerial(t *testing.T) {
 								"/app/compilr": "tar:jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva",
 								"/task/output/src": "tar:egruihieur"
 							},
-							"action": null,
+							"action": {
+								"exec": [
+									"build-cmd",
+									"args"
+								]
+							},
 							"outputs": {
 								"/task/logs": "tar",
 								"/task/output": "tar"
@@ -270,7 +280,11 @@ func TestSerial(t *testing.T) {
 								"/": "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
 								"/task/src": "git:e730adbee91e5584b12dd4cb438673785034ecbe"
 							},
-							"action": null,
+							"action": {
+								"exec": [
+									"somecommand"
+								]
+							},
 							"outputs": {
 								"/task/output/docs": "tar",
 								"/task/output/src": "tar"

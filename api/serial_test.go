@@ -17,8 +17,11 @@ func TestSerial(t *testing.T) {
 		ReleaseItemID_AtlasEntry,
 		Catalog_AtlasEntry,
 		ReleaseEntry_AtlasEntry,
+		rdef.WareID_AtlasEntry,
 		Replay_AtlasEntry,
 		Step_AtlasEntry,
+		rdef.Formula_AtlasEntry,
+		rdef.FormulaAction_AtlasEntry,
 		rdef.RunRecord_AtlasEntry,
 	)
 	Convey("ReleaseItemID serialization", t, func() {
@@ -47,8 +50,8 @@ func TestSerial(t *testing.T) {
 					[]ReleaseEntry{
 						{"1.0",
 							map[ItemLabel]rdef.WareID{
-								"item-a": "war:asdf",
-								"item-b": "war:qwer",
+								"item-a": {"war", "asdf"},
+								"item-b": {"war", "qwer"},
 							},
 							map[string]string{
 								"comment": "yes",
@@ -86,9 +89,9 @@ func TestSerial(t *testing.T) {
 					[]ReleaseEntry{
 						{"1.1",
 							map[ItemLabel]rdef.WareID{
-								"src":         "tar:egruihieur",
-								"docs":        "tar:387ty874yt",
-								"linux-amd64": "tar:ooijpwoeij",
+								"src":         {"tar", "egruihieur"},
+								"docs":        {"tar", "387ty874yt"},
+								"linux-amd64": {"tar", "ooijpwoeij"},
 							},
 							nil,
 							nil,
@@ -105,13 +108,15 @@ func TestSerial(t *testing.T) {
 											"/":         {"hub.repeatr.io/base", "2017-05-01", "linux-amd64"},
 											"/task/src": {"team.net/theproj", "2.1.1", "src"},
 										},
-										Formula: map[string]interface{}{
-											"inputs": map[rdef.AbsPath]string{
-												"/":         "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
-												"/task/src": "git:e730adbee91e5584b12dd4cb438673785034ecbe",
+										Formula: &rdef.Formula{
+											Inputs: map[rdef.AbsPath]rdef.WareID{
+												"/":         {"tar", "aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT"},
+												"/task/src": {"git", "e730adbee91e5584b12dd4cb438673785034ecbe"},
 											},
-											"action": nil, // ... some preprocessor step, whatever ...
-											"outputs": map[rdef.AbsPath]interface{}{
+											Action: rdef.FormulaAction{
+												Exec: []string{"somecommand"},
+											},
+											Outputs: map[rdef.AbsPath]string{
 												"/task/output/docs": "tar",
 												"/task/output/src":  "tar",
 											},
@@ -122,8 +127,8 @@ func TestSerial(t *testing.T) {
 												Time:      23495,
 												FormulaID: "oeiru43t3ijjrieqo", // somewhat redundantly, the SetupHash of the above formula.
 												Results: map[rdef.AbsPath]rdef.WareID{
-													"/task/output/docs": "tar:387ty874yt",
-													"/task/output/src":  "tar:egruihieur",
+													"/task/output/docs": {"tar", "387ty874yt"},
+													"/task/output/src":  {"tar", "egruihieur"},
 												},
 											},
 											// REVIEW.  A valid alternative way to do this would be putting the
@@ -140,14 +145,16 @@ func TestSerial(t *testing.T) {
 											"/app/compilr": {"hub.repeatr.io/compilr", "1.8", "linux-amd64"},
 											"/task/src":    {"wire", "prepare-step", "/task/output/src"},
 										},
-										Formula: map[string]interface{}{
-											"inputs": map[rdef.AbsPath]string{
-												"/":                "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
-												"/app/compilr":     "tar:jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva",
-												"/task/output/src": "tar:egruihieur",
+										Formula: &rdef.Formula{
+											Inputs: map[rdef.AbsPath]rdef.WareID{
+												"/":                {"tar", "aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT"},
+												"/app/compilr":     {"tar", "jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva"},
+												"/task/output/src": {"tar", "egruihieur"},
 											},
-											"action": nil, // ... some compiler is invoked ...
-											"outputs": map[rdef.AbsPath]interface{}{
+											Action: rdef.FormulaAction{
+												Exec: []string{"build-cmd", "args"},
+											},
+											Outputs: map[rdef.AbsPath]string{
 												"/task/output": "tar",
 												"/task/logs":   "tar", // this is a byproduct (implicit: no products point at it).
 											},
@@ -158,8 +165,8 @@ func TestSerial(t *testing.T) {
 												Time:      23499,
 												FormulaID: "h23hsfiuh48svi",
 												Results: map[rdef.AbsPath]rdef.WareID{
-													"/task/output": "tar:ooijpwoeij",
-													"/task/logs":   "tar:34t983hhei",
+													"/task/output": {"tar", "ooijpwoeij"},
+													"/task/logs":   {"tar", "34t983hhei"},
 												},
 											},
 											"krljthklj": &rdef.RunRecord{
@@ -167,8 +174,8 @@ func TestSerial(t *testing.T) {
 												Time:      23456,
 												FormulaID: "h23hsfiuh48svi",
 												Results: map[rdef.AbsPath]rdef.WareID{
-													"/task/output": "tar:ooijpwoeij",
-													"/task/logs":   "tar:poi2345926",
+													"/task/output": {"tar", "ooijpwoeij"},
+													"/task/logs":   {"tar", "poi2345926"},
 												},
 											},
 										},
@@ -187,9 +194,9 @@ func TestSerial(t *testing.T) {
 						},
 						{"1.0",
 							map[ItemLabel]rdef.WareID{
-								"src":         "war:asdf",
-								"docs":        "war:ayhf",
-								"linux-amd64": "war:qwer",
+								"src":         {"war", "asdf"},
+								"docs":        {"war", "ayhf"},
+								"linux-amd64": {"war", "qwer"},
 							},
 							nil,
 							map[string]string{
@@ -222,11 +229,16 @@ func TestSerial(t *testing.T) {
 							"/task/src": "wire:prepare-step:/task/output/src"
 						},
 						"formula": {
-							"action": null,
 							"inputs": {
 								"/": "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
 								"/app/compilr": "tar:jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva",
 								"/task/output/src": "tar:egruihieur"
+							},
+							"action": {
+								"exec": [
+									"build-cmd",
+									"args"
+								]
 							},
 							"outputs": {
 								"/task/logs": "tar",
@@ -264,10 +276,14 @@ func TestSerial(t *testing.T) {
 							"/task/src": "team.net/theproj:2.1.1:src"
 						},
 						"formula": {
-							"action": null,
 							"inputs": {
 								"/": "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
 								"/task/src": "git:e730adbee91e5584b12dd4cb438673785034ecbe"
+							},
+							"action": {
+								"exec": [
+									"somecommand"
+								]
 							},
 							"outputs": {
 								"/task/output/docs": "tar",

@@ -8,6 +8,8 @@
 package rdef
 
 import (
+	"strings"
+
 	"github.com/polydawn/refmt/obj/atlas"
 )
 
@@ -15,12 +17,27 @@ import (
 	Ware IDs are content-addressable, cryptographic hashes which uniquely identify
 	a "ware" -- a packed filesystem snapshot.
 
-	Ware IDs come in two parts, separated by a colon --
+	Ware IDs are serialized as a string in two parts, separated by a colon --
 	for example like "git:f23ae1829" or "tar:WJL8or32vD".
 	The first part communicates which kind of packing system computed the hash,
 	and the second part is the hash itself.
 */
-type WareID string
+type WareID struct {
+	Type string
+	Hash string
+}
+
+var WareID_AtlasEntry = atlas.BuildEntry(WareID{}).Transform().
+	TransformMarshal(atlas.MakeMarshalTransformFunc(
+		func(x WareID) (string, error) {
+			return string(x.Type) + ":" + string(x.Hash), nil
+		})).
+	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
+		func(x string) (WareID, error) {
+			ss := strings.Split(x, ":")
+			return WareID{ss[0], ss[1]}, nil
+		})).
+	Complete()
 
 type SetupHash string // HID of formula
 

@@ -5,14 +5,37 @@ import (
 	"polydawn.net/hitch/api/rdef"
 )
 
-type ReleaseEntryBuilder struct {
+type StagedRelease struct {
 }
 
-func (x *ReleaseEntryBuilder) AppendStep(
+/*
+	Call to add a step, naming it and providing its formula, and
+	optionally the ReleaseItemIDs naming where the inputs were selected from.
+*/
+func (x *StagedRelease) AppendStep(
 	name api.StepName,
+	formula *rdef.Formula,
 	upstream map[*rdef.AbsPath]api.ReleaseItemID, // must onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
-	formula *rdef.Formula, // yes, with hashes.  these HAD BETTER match the upstreams if you check it, but, if upstreams mutate, then, well, that's why we vendored it here.
-	runRecord *rdef.RunRecord, // REVIEW maybe append these separately; verify checks if any step has zero runrecords at end.
+) {
+
+}
+
+/*
+	Call to add a RunRecord to a step.
+	The step name must already have been created by `AppendStep`.
+
+	The RunRecord's recorded formula setuphash must match the setuphash
+	of the formula for this step, or it is invalid.
+	The RunRecord's outputs must match the output slots named in the formula
+	for this step, or it is invalid (unless you're mucking with the document,
+	output from `repeatr run` for the formula should always match).
+
+	TODO: define at what point we check multiple RunRecords for coherency
+	on wired outputs
+*/
+func (x *StagedRelease) AppendRunRecord(
+	name api.StepName,
+	runRecord *rdef.RunRecord,
 ) {
 
 }
@@ -24,6 +47,6 @@ func (x *ReleaseEntryBuilder) AppendStep(
 	records in the same order they were built, but it's equally valid to append
 	an unordered set of records and then call verify once at the end.
 */
-func (x *ReleaseEntryBuilder) MustVerify() {
+func (x *StagedRelease) MustVerify() {
 
 }

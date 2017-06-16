@@ -142,7 +142,7 @@ type Step struct {
 	// and dedup the computation; the steps are still stored separately, because
 	// it is correct to render them separately in order to represent the
 	// releaser's original intentions clearly.
-	Formula rdef.Formula
+	Formula *rdef.Formula
 
 	// RunRecords from executions of this formula.
 	// May be one or multiple.

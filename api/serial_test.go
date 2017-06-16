@@ -20,6 +20,7 @@ func TestSerial(t *testing.T) {
 		rdef.WareID_AtlasEntry,
 		Replay_AtlasEntry,
 		Step_AtlasEntry,
+		rdef.Formula_AtlasEntry,
 		rdef.RunRecord_AtlasEntry,
 	)
 	Convey("ReleaseItemID serialization", t, func() {
@@ -106,13 +107,13 @@ func TestSerial(t *testing.T) {
 											"/":         {"hub.repeatr.io/base", "2017-05-01", "linux-amd64"},
 											"/task/src": {"team.net/theproj", "2.1.1", "src"},
 										},
-										Formula: map[string]interface{}{
-											"inputs": map[rdef.AbsPath]string{
-												"/":         "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
-												"/task/src": "git:e730adbee91e5584b12dd4cb438673785034ecbe",
+										Formula: &rdef.Formula{
+											Inputs: map[rdef.AbsPath]rdef.WareID{
+												"/":         {"tar", "aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT"},
+												"/task/src": {"git", "e730adbee91e5584b12dd4cb438673785034ecbe"},
 											},
-											"action": nil, // ... some preprocessor step, whatever ...
-											"outputs": map[rdef.AbsPath]interface{}{
+											//Action: nil, // ... some preprocessor step, whatever ...
+											Outputs: map[rdef.AbsPath]string{
 												"/task/output/docs": "tar",
 												"/task/output/src":  "tar",
 											},
@@ -141,14 +142,14 @@ func TestSerial(t *testing.T) {
 											"/app/compilr": {"hub.repeatr.io/compilr", "1.8", "linux-amd64"},
 											"/task/src":    {"wire", "prepare-step", "/task/output/src"},
 										},
-										Formula: map[string]interface{}{
-											"inputs": map[rdef.AbsPath]rdef.WareID{
+										Formula: &rdef.Formula{
+											Inputs: map[rdef.AbsPath]rdef.WareID{
 												"/":                {"tar", "aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT"},
 												"/app/compilr":     {"tar", "jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva"},
 												"/task/output/src": {"tar", "egruihieur"},
 											},
-											"action": nil, // ... some compiler is invoked ...
-											"outputs": map[rdef.AbsPath]interface{}{
+											//Action: nil, // ... some compiler is invoked ...
+											Outputs: map[rdef.AbsPath]string{
 												"/task/output": "tar",
 												"/task/logs":   "tar", // this is a byproduct (implicit: no products point at it).
 											},
@@ -223,12 +224,12 @@ func TestSerial(t *testing.T) {
 							"/task/src": "wire:prepare-step:/task/output/src"
 						},
 						"formula": {
-							"action": null,
 							"inputs": {
 								"/": "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
 								"/app/compilr": "tar:jZ8NkMmCPUb5rTHtjBLZEe0usTSDjgGfD71hN07wuuPfkoqG6pLB0FR4GKmQRAva",
 								"/task/output/src": "tar:egruihieur"
 							},
+							"action": null,
 							"outputs": {
 								"/task/logs": "tar",
 								"/task/output": "tar"
@@ -265,11 +266,11 @@ func TestSerial(t *testing.T) {
 							"/task/src": "team.net/theproj:2.1.1:src"
 						},
 						"formula": {
-							"action": null,
 							"inputs": {
 								"/": "tar:aLMH4qK1EdlPDavdhErOs0BPxqO0i6lUaeRE4DuUmnNMxhHtF56gkoeSulvwWNqT",
 								"/task/src": "git:e730adbee91e5584b12dd4cb438673785034ecbe"
 							},
+							"action": null,
 							"outputs": {
 								"/task/output/docs": "tar",
 								"/task/output/src": "tar"

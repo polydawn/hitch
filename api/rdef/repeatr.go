@@ -39,9 +39,25 @@ var WareID_AtlasEntry = atlas.BuildEntry(WareID{}).Transform().
 		})).
 	Complete()
 
-type SetupHash string // HID of formula
-
 type AbsPath string // Identifier for output slots.  Coincidentally, a path.
+
+type (
+	Formula struct {
+		Inputs  FormulaInputs
+		Action  FormulaAction
+		Outputs FormulaOutputs
+	}
+
+	FormulaInputs map[AbsPath]WareID
+
+	FormulaAction interface{} // TODO flesh this back out
+
+	FormulaOutputs map[AbsPath]string // TODO probably need more there than the ware type name ... although we could put normalizers in the "action" section
+
+	SetupHash string // HID of formula
+)
+
+var Formula_AtlasEntry = atlas.BuildEntry(Formula{}).StructMap().Autogenerate().Complete()
 
 type RunRecord struct {
 	UID       string             // random number, presumed globally unique.
@@ -58,5 +74,3 @@ type RunRecord struct {
 var RunRecord_AtlasEntry = atlas.BuildEntry(RunRecord{}).StructMap().Autogenerate().Complete()
 
 type RunRecordHash string // HID of RunRecord.  Includes UID, etc, so quite unique.  Prefer this to UID for primary key in storage (it's collision resistant).
-
-type Formula interface{} // TODO bother to finish fleshing this back out

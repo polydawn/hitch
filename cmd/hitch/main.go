@@ -20,11 +20,13 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode in
 	app.HelpFlag.Short('h')
 	cmd, err := app.Parse(args)
 	if err != nil {
-		fmt.Fprintf(stderr, "%s\n", err)
+		fmt.Fprintf(stderr, "hitch: invalid command: %s\n", err)
 		return 1
 	}
 	switch cmd {
 	// todo more
+	default:
+		fmt.Fprintf(stderr, "hitch: missing subcommand!  try 'hitch -h' for help.\n")
+		return 1
 	}
-	return 0
 }

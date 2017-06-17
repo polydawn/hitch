@@ -6,7 +6,49 @@ import (
 )
 
 type StagedRelease struct {
+	Steps map[api.StepName]StagedStep
 }
+
+type StagedStep struct {
+	formula  *rdef.Formula
+	upstream map[*rdef.AbsPath]api.ReleaseItemID
+	records  []*rdef.RunRecord,
+}
+
+/*
+	Returns keys in upstream which do not map to a formula input path
+*/
+func (ss *StagedStep) validateUpstreamInjective() ([]rdef.AbsPath, []rdef.AbsPath) {
+	formulaOnly := []rdef.AbsPath{}
+	for k, _ := range ss.formula.Inputs {
+		_, ok := ss.upstream[key]
+		if !ok {
+			formulaOnly = append(formulaOnly, key)
+		}
+	}
+	return upstreamOnly, formulaOnly
+}
+
+/*
+	Returns input paths in formula which do not map to an upstream entry
+*/
+func (ss *StagedStep) validateUpstreamSurjective() []rdef.AbsPath {
+	upstreamOnly := []rdef.AbsPath{}
+	for key, _ := range ss.upstream {
+		_, ok := ss.formula.Inputs[key]
+		if !ok {
+			upstreamOnly = append(upstreamOnly, key)
+		}
+	}
+	return upstreamOnly
+}
+
+func (ss *StagedStep) validateRecords(outputs []rdef.AbsPath) []error {
+	// TODO: Validate that all run records have the same output
+	// only need to error on wired outputs
+	return []error{}
+}
+
 
 /*
 	Call to add a step, naming it and providing its formula, and
@@ -15,9 +57,17 @@ type StagedRelease struct {
 func (x *StagedRelease) AppendStep(
 	name api.StepName,
 	formula *rdef.Formula,
-	upstream map[*rdef.AbsPath]api.ReleaseItemID, // must onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
-) {
-
+	upstream map[rdef.AbsPath]api.ReleaseItemID, // must be onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
+) error {
+	step = StagedStep{
+		formuala: formula,
+		upstream: upstream,
+	}
+	results := step.validateUpstreamSurjective()
+	if len(results) > 0 {
+		return fmt.Errorf("Invalid upstreams: %v", results)
+	}
+	x.Steps[name] = step
 }
 
 /*
@@ -36,8 +86,15 @@ func (x *StagedRelease) AppendStep(
 func (x *StagedRelease) AppendRunRecord(
 	name api.StepName,
 	runRecord *rdef.RunRecord,
-) {
-
+) error {
+	step, ok = x[name]
+	if !ok {
+		return fmt.Errorf("Step %s does not exist", name)
+	}
+	if runRecord == nil {
+		return fmt.Errorf("Can't add nil run records")
+	}
+	step.records = append(step.records, runRecord)
 }
 
 /*

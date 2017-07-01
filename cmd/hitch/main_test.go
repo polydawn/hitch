@@ -22,14 +22,6 @@ func callMain(args []string, stdin io.Reader) (string, string, int) {
 
 func TestCLI(t *testing.T) {
 	Convey("Test CLI", t, func() {
-		Convey("'hitch' with no args should error", func() {
-			stdout, stderr, code := callMain(
-				[]string{}, nil,
-			)
-			So(stderr, ShouldContainSubstring, "missing subcommand")
-			So(stdout, ShouldEqual, "")
-			So(code, ShouldEqual, 1)
-		})
 		Convey("'hitch -h' should emit help", func() {
 			stdout, stderr, code := callMain(
 				[]string{"-h"}, nil,
@@ -42,6 +34,14 @@ func TestCLI(t *testing.T) {
 		Convey("'hitch -x' should error about unknown flag", func() {
 			stdout, stderr, code := callMain(
 				[]string{"-x"}, nil,
+			)
+			So(stderr, ShouldContainSubstring, "invalid command")
+			So(stdout, ShouldEqual, "")
+			So(code, ShouldEqual, 1)
+		})
+		Convey("'hitch asdf' should error about unknown command", func() {
+			stdout, stderr, code := callMain(
+				[]string{"asdf"}, nil,
 			)
 			So(stderr, ShouldContainSubstring, "invalid command")
 			So(stdout, ShouldEqual, "")

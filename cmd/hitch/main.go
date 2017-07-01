@@ -14,6 +14,15 @@ func main() {
 
 var (
 	app = kingpin.New("hitch", "Repeatr release control")
+
+	releaseCmd                = app.Command("release", "Create new releases.")
+	releaseStartCmd           = releaseCmd.Command("start", "Start staging a new release.  (Use more release commands to add data, then commit when done.)")
+	releaseAddStepCmd         = releaseCmd.Command("add-step", "Add a step to the replay instructions in the currently staged release.")
+	releaseAddStep_NameArg    = kingpin.Arg("name", "The name to assign this new step.").Required().String()
+	releaseAddStep_FormulaArg = kingpin.Arg("formula", "The path to the formula file that runs this step.").Required().String()
+	releaseAddStep_ImportsArg = kingpin.Arg("imports", "The path to an imports file which explains the catalogs and release names for wares in the step formula.").String()
+
+	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
 
 func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode int) {

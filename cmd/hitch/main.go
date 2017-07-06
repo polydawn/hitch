@@ -14,6 +14,19 @@ func main() {
 
 var (
 	app = kingpin.New("hitch", "Repeatr release control")
+
+	initCmd = app.Command("init", "Initialize a new hitch DB.")
+
+	releaseCmd                = app.Command("release", "Create new releases.")
+	releaseStartCmd           = releaseCmd.Command("start", "Start staging a new release.  (Use more release commands to add data, then commit when done.)")
+	releaseStart_CatalogArg   = releaseStartCmd.Arg("catalogName", "The name to assign this new step.").Required().String()
+	releaseStart_ReleaseArg   = releaseStartCmd.Arg("releaseName", "The path to the formula file that runs this step.").Required().String()
+	releaseAddStepCmd         = releaseCmd.Command("add-step", "Add a step to the replay instructions in the release currently being staged.")
+	releaseAddStep_NameArg    = releaseAddStepCmd.Arg("name", "The name to assign this new step.").Required().String()
+	releaseAddStep_FormulaArg = releaseAddStepCmd.Arg("formula", "The path to the formula file that runs this step.").Required().String()
+	releaseAddStep_ImportsArg = releaseAddStepCmd.Arg("imports", "The path to an imports file which explains the catalogs and release names for wares in the step formula.").String()
+
+	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
 
 func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode int) {
@@ -40,9 +53,13 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode in
 
 	// Switch for command to invoke.
 	switch cmd {
-	// todo more
+	case releaseStartCmd.FullCommand():
+		return 0
+	case releaseAddStepCmd.FullCommand():
+		fmt.Fprintf(stdout, "whee!\n%q\n%q\n%q\n", *releaseAddStep_NameArg, *releaseAddStep_FormulaArg, *releaseAddStep_ImportsArg)
+		return 0
 	default:
-		fmt.Fprintf(stderr, "hitch: missing subcommand!  try 'hitch -h' for help.\n")
+		panic(fmt.Errorf("hitch: unhandled command %q", cmd))
 		return 1
 	}
 }

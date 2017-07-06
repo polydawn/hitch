@@ -19,3 +19,6 @@
 [submodule ".gopath/src/gopkg.in/alecthomas/kingpin.v2"]
 	path = .gopath/src/gopkg.in/alecthomas/kingpin.v2
 	url = https://gopkg.in/alecthomas/kingpin.v2
+[submodule ".gopath/src/go.polydawn.net/meep"]
+	path = .gopath/src/go.polydawn.net/meep
+	url = https://github.com/polydawn/meep

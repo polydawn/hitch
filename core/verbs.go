@@ -1,4 +1,4 @@
-package hcore
+package core
 
 import (
 	"polydawn.net/hitch/api"

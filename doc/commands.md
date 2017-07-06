@@ -4,7 +4,7 @@ hitch command line interface
 ### Release creation commands:
 
 ```
-hitch release start <projectname> <releasename>
+hitch release start <catalogname> <releasename>
 hitch release add-step <stepname> <formula.filename> [<importlist.filename>]
 hitch release add-runrecord <stepname> <runrecord.filename>...
 hitch release add-label <labelname> <wareID>
@@ -17,21 +17,21 @@ hitch release reset
 ### Inspection commands:
 
 ```
-hitch show <projectname>
-hitch show <projectname>:<releasename>
-hitch show <projectname>:<releasename>:<labelname>
-hitch show-latest <projectname> [<labelname>]
+hitch show <catalogname>
+hitch show <catalogname>:<releasename>
+hitch show <catalogname>:<releasename>:<labelname>
+hitch show-latest <catalogname> [<labelname>]
 hitch list catalogs
-hitch list releases <projectname>
-hitch list labels <projectname>:<releasename>
-hitch show-replay <projectname>:<releasename>
+hitch list releases <catalogname>
+hitch list labels <catalogname>:<releasename>
+hitch show-replay <catalogname>:<releasename>
 ```
 
 ### Exchanging catalogs with other hitch datasets:
 
 ```
 hitch import raw <catalog.filename>
-hitch import repo <otherhitch.path> <projectname>
+hitch import repo <otherhitch.path> <catalogname>
 ```
 
 

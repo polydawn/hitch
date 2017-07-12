@@ -27,7 +27,7 @@ func LoadByCwd() (*Controller, error) {
 }
 
 func load(basePath string, f *os.File) (*Controller, error) {
-	ctrl := &Controller{basePath: basePath}
+	ctrl := &Controller{BasePath: basePath}
 	// When we actually have a main info file: parse it here.
 	return ctrl, nil
 }

@@ -6,6 +6,8 @@ import (
 	"os"
 
 	"gopkg.in/alecthomas/kingpin.v2"
+
+	"go.polydawn.net/hitch/core"
 )
 
 func main() {
@@ -53,6 +55,9 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode in
 
 	// Switch for command to invoke.
 	switch cmd {
+	case initCmd.FullCommand():
+		core.Init()
+		return 0
 	case releaseStartCmd.FullCommand():
 		return 0
 	case releaseAddStepCmd.FullCommand():

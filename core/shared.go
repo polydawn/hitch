@@ -10,9 +10,8 @@ type UI struct {
 	Stderr io.Writer
 }
 
-// Panic with this to cause an "exit" with the given code.
-// It will be caught by the "main" method and returned as an int again,
-// so tests can DTRT and get coverage of exit codes without forking.
-type Exit struct {
-	Code int
-}
+type ExitCode int
+
+const (
+	EXIT_SUCCESS ExitCode = 0
+)

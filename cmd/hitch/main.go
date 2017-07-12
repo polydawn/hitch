@@ -11,7 +11,8 @@ import (
 )
 
 func main() {
-	os.Exit(Main(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
+	exitCode := Main(os.Args[1:], os.Stdin, os.Stdout, os.Stderr)
+	os.Exit(int(exitCode))
 }
 
 var (
@@ -31,14 +32,14 @@ var (
 	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
 
-func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode int) {
+func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode core.ExitCode) {
 	app.HelpFlag.Short('h')
 
 	// Rigging kingpin to use our in/out/err/code.
 	var kingpinTerminate bool
 	app.Terminate(func(status int) {
 		kingpinTerminate = true
-		exitCode = status
+		exitCode = core.ExitCode(status)
 	})
 	app.UsageWriter(stderr)
 	app.ErrorWriter(stderr)
@@ -59,8 +60,7 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode in
 	// Switch for command to invoke.
 	switch cmd {
 	case initCmd.FullCommand():
-		core.Init(ui)
-		return 0
+		return core.Init(ui)
 	case releaseStartCmd.FullCommand():
 		return 0
 	case releaseAddStepCmd.FullCommand():

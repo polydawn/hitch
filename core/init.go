@@ -8,26 +8,30 @@ import (
 	"go.polydawn.net/hitch/lib/locator"
 )
 
-func Init() {
+func Init(ui UI) {
 	// Check for existing hitch.db root anywhere above this.
 	//  Reject if exists.  Nested repos would be silly.
 	dbctrl, err := db.LoadByCwd()
 	switch err.(type) {
 	case nil:
-		panic(fmt.Errorf("cannot init new hitch.db -- one already exists, rooted at %q!", dbctrl.BasePath))
+		fmt.Fprintf(ui.Stderr, "cannot init new hitch.db -- one already exists, rooted at %q!\n", dbctrl.BasePath)
+		panic(Exit{5})
 	case *locator.ErrNotFound:
 		// pass!
 	default:
-		panic(err)
+		fmt.Fprintf(ui.Stderr, "error while searching for hitch.db -- %s\n", err)
+		panic(Exit{7})
 	}
 
 	// Make hitch.db sigil file in cwd.
 	cwd, err := os.Getwd()
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(ui.Stderr, "error while creating hitch.db -- %s\n", err)
+		panic(Exit{8})
 	}
 	_, err = db.Create(cwd)
 	if err != nil {
-		panic(err)
+		fmt.Fprintf(ui.Stderr, "error while creating hitch.db -- %s\n", err)
+		panic(Exit{8})
 	}
 }

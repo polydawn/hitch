@@ -53,10 +53,13 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode in
 		return 1
 	}
 
+	// Bundle UI handles.
+	ui := core.UI{stdin, stdout, stderr}
+
 	// Switch for command to invoke.
 	switch cmd {
 	case initCmd.FullCommand():
-		core.Init()
+		core.Init(ui)
 		return 0
 	case releaseStartCmd.FullCommand():
 		return 0

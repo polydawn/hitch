@@ -1,8 +1,8 @@
 package core
 
 import (
-	"polydawn.net/hitch/api"
-	"polydawn.net/hitch/api/rdef"
+	"go.polydawn.net/hitch/api"
+	"go.polydawn.net/hitch/api/rdef"
 )
 
 type ReleaseEntryBuilder struct {

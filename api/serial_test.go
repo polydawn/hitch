@@ -9,7 +9,7 @@ import (
 	"github.com/polydawn/refmt/obj/atlas"
 	. "github.com/smartystreets/goconvey/convey"
 
-	"polydawn.net/hitch/api/rdef"
+	"go.polydawn.net/hitch/api/rdef"
 )
 
 func TestSerial(t *testing.T) {

@@ -5,7 +5,7 @@ import (
 
 	"github.com/polydawn/refmt/obj/atlas"
 
-	"polydawn.net/hitch/api/rdef"
+	"go.polydawn.net/hitch/api/rdef"
 )
 
 /*

@@ -20,6 +20,8 @@ var (
 
 	initCmd = app.Command("init", "Initialize a new hitch DB.")
 
+	createCmd                 = app.Command("create", "Grouping command for creating new things, like catalogs.")
+	createCatalogCmd          = createCmd.Command("catalog", "Create a new catalog for publishing releases in.")
 	releaseCmd                = app.Command("release", "Create new releases.")
 	releaseStartCmd           = releaseCmd.Command("start", "Start staging a new release.  (Use more release commands to add data, then commit when done.)")
 	releaseStart_CatalogArg   = releaseStartCmd.Arg("catalogName", "The name to assign this new step.").Required().String()

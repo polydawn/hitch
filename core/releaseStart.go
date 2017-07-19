@@ -5,12 +5,13 @@ import (
 	"os"
 	"path/filepath"
 
+	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/core/stage"
 	"go.polydawn.net/hitch/lib/locator"
 )
 
-func ReleaseStart(ui UI, catalogName, releaseName string) ExitCode {
+func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) ExitCode {
 	// Find hitch.db root.
 	dbctrl, err := db.LoadByCwd()
 	switch err.(type) {
@@ -38,6 +39,11 @@ func ReleaseStart(ui UI, catalogName, releaseName string) ExitCode {
 		return EXIT_WEIRDFS
 	}
 
+	// Validate names fit within acceptable string ranges.
+	// TODO : write some regexps for this and do real checks.
+	catalogName := api.CatalogName(catalogNameStr)
+	releaseName := api.ReleaseName(releaseNameStr)
+
 	// Check for catalog already existing.  Reject if not (this is fat-finger avoidance).
 	// TODO : come back here after writing more db inspection methods.
 
@@ -49,7 +55,7 @@ func ReleaseStart(ui UI, catalogName, releaseName string) ExitCode {
 
 	// All checks passed!
 	// Initialize stage state on disk.
-	_, err = stage.Create(dbctrl, stage.DefaultPath)
+	_, err = stage.Create(dbctrl, stage.DefaultPath, catalogName, releaseName)
 	if err != nil {
 		fmt.Fprintf(ui.Stderr, "error while initializing stage state -- %s\n", err)
 		return EXIT_WEIRDFS

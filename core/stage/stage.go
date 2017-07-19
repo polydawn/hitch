@@ -13,6 +13,8 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/polydawn/refmt"
+
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
 )
@@ -37,7 +39,7 @@ func Create(
 	if err != nil {
 		return nil, err
 	}
-	f, err := os.OpenFile(filepath.Join(dbctrl.BasePath, stagePath, "stage.json"), os.O_CREATE|os.O_EXCL, 0644)
+	f, err := os.OpenFile(filepath.Join(dbctrl.BasePath, stagePath, "stage.json"), os.O_WRONLY|os.O_CREATE|os.O_EXCL, 0644)
 	if err != nil {
 		return nil, err
 	}
@@ -66,7 +68,8 @@ func (stageCtrl *Controller) Save() error {
 }
 
 func (stageCtrl *Controller) flush(w io.Writer) error {
-	return nil // TODO serialize
+	return refmt.NewAtlasedJsonEncoder(w, api.Atlas).
+		Marshal(stageCtrl.Catalog)
 }
 
 func Load(dbctrl *db.Controller, stagePath string) (*Controller, error) {

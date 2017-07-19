@@ -23,7 +23,7 @@ type Controller struct {
 	dbctrl    *db.Controller
 	stagePath string
 
-	catalog api.Catalog // catalog struct, sync'd with file.  always must have exactly one release entry.
+	Catalog api.Catalog // catalog struct, sync'd with file.  always must have exactly one release entry.
 }
 
 /*
@@ -46,7 +46,7 @@ func Create(
 		dbctrl:    dbctrl,
 		stagePath: stagePath,
 
-		catalog: api.Catalog{
+		Catalog: api.Catalog{
 			Name: catalogName,
 			Releases: []api.ReleaseEntry{
 				{Name: releaseName},
@@ -56,12 +56,21 @@ func Create(
 	return stageCtrl, stageCtrl.flush(f)
 }
 
+func (stageCtrl *Controller) Save() error {
+	f, err := os.OpenFile(filepath.Join(stageCtrl.dbctrl.BasePath, stageCtrl.stagePath, "stage.json"), os.O_WRONLY|os.O_TRUNC, 0)
+	if err != nil {
+		return err
+	}
+	defer f.Close()
+	return stageCtrl.flush(f)
+}
+
 func (stageCtrl *Controller) flush(w io.Writer) error {
 	return nil // TODO serialize
 }
 
 func Load(dbctrl *db.Controller, stagePath string) (*Controller, error) {
-	f, err := os.OpenFile(filepath.Join(dbctrl.BasePath, stagePath, "stage.json"), os.O_RDWR, 0)
+	f, err := os.OpenFile(filepath.Join(dbctrl.BasePath, stagePath, "stage.json"), os.O_RDONLY, 0)
 	if err != nil {
 		return nil, err
 	}

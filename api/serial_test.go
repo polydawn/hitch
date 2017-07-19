@@ -6,26 +6,15 @@ import (
 	"testing"
 
 	"github.com/polydawn/refmt"
-	"github.com/polydawn/refmt/obj/atlas"
 	. "github.com/smartystreets/goconvey/convey"
 
 	"go.polydawn.net/hitch/api/rdef"
 )
 
 func TestSerial(t *testing.T) {
-	atl := atlas.MustBuild(
-		ReleaseItemID_AtlasEntry,
-		Catalog_AtlasEntry,
-		ReleaseEntry_AtlasEntry,
-		rdef.WareID_AtlasEntry,
-		Replay_AtlasEntry,
-		Step_AtlasEntry,
-		rdef.Formula_AtlasEntry,
-		rdef.FormulaAction_AtlasEntry,
-		rdef.RunRecord_AtlasEntry,
-	)
+
 	Convey("ReleaseItemID serialization", t, func() {
-		msg, err := refmt.JsonEncodeAtlased(atl,
+		msg, err := refmt.JsonEncodeAtlased(Atlas,
 			ReleaseItemID{"a", "b", "c"})
 		So(err, ShouldBeNil)
 		So(string(msg), ShouldResemble, `"a:b:c"`)
@@ -35,7 +24,7 @@ func TestSerial(t *testing.T) {
 	})
 	Convey("Catalog serialization", t, func() {
 		Convey("empty catalog, no releases", func() {
-			msg, err := refmt.JsonEncodeAtlased(atl,
+			msg, err := refmt.JsonEncodeAtlased(Atlas,
 				Catalog{
 					"cname",
 					[]ReleaseEntry{},
@@ -44,7 +33,7 @@ func TestSerial(t *testing.T) {
 			So(string(msg), ShouldResemble, `{"name":"cname","releases":[]}`)
 		})
 		Convey("short catalog: one release, no replay", func() {
-			msg, err := refmt.JsonEncodeAtlased(atl,
+			msg, err := refmt.JsonEncodeAtlased(Atlas,
 				Catalog{
 					"cname",
 					[]ReleaseEntry{
@@ -83,7 +72,7 @@ func TestSerial(t *testing.T) {
 		})
 
 		Convey("medium catalog: multiple releases, interesting replays", func() {
-			msg, err := refmt.JsonEncodeAtlased(atl,
+			msg, err := refmt.JsonEncodeAtlased(Atlas,
 				Catalog{
 					"cname",
 					[]ReleaseEntry{

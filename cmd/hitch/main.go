@@ -11,7 +11,8 @@ import (
 )
 
 func main() {
-	os.Exit(Main(os.Args[1:], os.Stdin, os.Stdout, os.Stderr))
+	exitCode := Main(os.Args[1:], os.Stdin, os.Stdout, os.Stderr)
+	os.Exit(int(exitCode))
 }
 
 var (
@@ -19,6 +20,8 @@ var (
 
 	initCmd = app.Command("init", "Initialize a new hitch DB.")
 
+	createCmd                 = app.Command("create", "Grouping command for creating new things, like catalogs.")
+	createCatalogCmd          = createCmd.Command("catalog", "Create a new catalog for publishing releases in.")
 	releaseCmd                = app.Command("release", "Create new releases.")
 	releaseStartCmd           = releaseCmd.Command("start", "Start staging a new release.  (Use more release commands to add data, then commit when done.)")
 	releaseStart_CatalogArg   = releaseStartCmd.Arg("catalogName", "The name to assign this new step.").Required().String()
@@ -31,14 +34,14 @@ var (
 	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
 
-func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode int) {
+func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode core.ExitCode) {
 	app.HelpFlag.Short('h')
 
 	// Rigging kingpin to use our in/out/err/code.
 	var kingpinTerminate bool
 	app.Terminate(func(status int) {
 		kingpinTerminate = true
-		exitCode = status
+		exitCode = core.ExitCode(status)
 	})
 	app.UsageWriter(stderr)
 	app.ErrorWriter(stderr)
@@ -53,11 +56,13 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode in
 		return 1
 	}
 
+	// Bundle UI handles.
+	ui := core.UI{stdin, stdout, stderr}
+
 	// Switch for command to invoke.
 	switch cmd {
 	case initCmd.FullCommand():
-		core.Init()
-		return 0
+		return core.Init(ui)
 	case releaseStartCmd.FullCommand():
 		return 0
 	case releaseAddStepCmd.FullCommand():

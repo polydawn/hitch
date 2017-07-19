@@ -4,6 +4,7 @@ hitch command line interface
 ### Release creation commands:
 
 ```
+hitch create catalog <catalogname>
 hitch release start <catalogname> <releasename>
 hitch release add-step <stepname> <formula.filename> [<importlist.filename>]
 hitch release add-runrecord <stepname> <runrecord.filename>...

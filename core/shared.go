@@ -13,5 +13,10 @@ type UI struct {
 type ExitCode int
 
 const (
-	EXIT_SUCCESS ExitCode = 0
+	EXIT_SUCCESS    ExitCode = 0
+	EXIT_COMMAND             = 1 // Indicates usage errors.
+	EXIT_PANIC               = 2 // Placeholder.  We don't use this.  '2' happens when golang exits due to panic.
+	EXIT_WEIRDFS             = 5 // Indicates some I/O error: permission denied, etc.
+	EXIT_DBNOTFOUND          = 6 // Returned when a hitch command is used outside of a hitch.db path.
+	EXIT_INPROGRESS          = 7 // Indicates desired operation is already begun -- e.g., `hitch init` is used and a hitch.db already exists; `hitch release start` when something is already staged, etc.
 )

@@ -64,7 +64,7 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode co
 	case initCmd.FullCommand():
 		return core.Init(ui)
 	case releaseStartCmd.FullCommand():
-		return 0
+		return core.ReleaseStart(ui, *releaseStart_CatalogArg, *releaseStart_ReleaseArg)
 	case releaseAddStepCmd.FullCommand():
 		fmt.Fprintf(stdout, "whee!\n%q\n%q\n%q\n", *releaseAddStep_NameArg, *releaseAddStep_FormulaArg, *releaseAddStep_ImportsArg)
 		return 0

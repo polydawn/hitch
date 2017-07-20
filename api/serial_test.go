@@ -2,49 +2,40 @@ package api
 
 import (
 	"bytes"
-	"encoding/json"
+	stdjson "encoding/json"
 	"testing"
 
 	"github.com/polydawn/refmt"
-	"github.com/polydawn/refmt/obj/atlas"
+	"github.com/polydawn/refmt/json"
 	. "github.com/smartystreets/goconvey/convey"
 
 	"go.polydawn.net/hitch/api/rdef"
 )
 
 func TestSerial(t *testing.T) {
-	atl := atlas.MustBuild(
-		ReleaseItemID_AtlasEntry,
-		Catalog_AtlasEntry,
-		ReleaseEntry_AtlasEntry,
-		rdef.WareID_AtlasEntry,
-		Replay_AtlasEntry,
-		Step_AtlasEntry,
-		rdef.Formula_AtlasEntry,
-		rdef.FormulaAction_AtlasEntry,
-		rdef.RunRecord_AtlasEntry,
-	)
 	Convey("ReleaseItemID serialization", t, func() {
-		msg, err := refmt.JsonEncodeAtlased(atl,
-			ReleaseItemID{"a", "b", "c"})
+		msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
+			ReleaseItemID{"a", "b", "c"},
+			Atlas)
 		So(err, ShouldBeNil)
 		So(string(msg), ShouldResemble, `"a:b:c"`)
 		var reheat string
-		So(json.Unmarshal(msg, &reheat), ShouldBeNil)
+		So(stdjson.Unmarshal(msg, &reheat), ShouldBeNil)
 		So(reheat, ShouldResemble, "a:b:c")
 	})
 	Convey("Catalog serialization", t, func() {
 		Convey("empty catalog, no releases", func() {
-			msg, err := refmt.JsonEncodeAtlased(atl,
+			msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
 				Catalog{
 					"cname",
 					[]ReleaseEntry{},
-				})
+				},
+				Atlas)
 			So(err, ShouldBeNil)
 			So(string(msg), ShouldResemble, `{"name":"cname","releases":[]}`)
 		})
 		Convey("short catalog: one release, no replay", func() {
-			msg, err := refmt.JsonEncodeAtlased(atl,
+			msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
 				Catalog{
 					"cname",
 					[]ReleaseEntry{
@@ -60,7 +51,8 @@ func TestSerial(t *testing.T) {
 							nil,
 						},
 					},
-				})
+				},
+				Atlas)
 			So(err, ShouldBeNil)
 			So(jsonPretty(msg), ShouldResemble,
 				`{
@@ -83,7 +75,7 @@ func TestSerial(t *testing.T) {
 		})
 
 		Convey("medium catalog: multiple releases, interesting replays", func() {
-			msg, err := refmt.JsonEncodeAtlased(atl,
+			msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
 				Catalog{
 					"cname",
 					[]ReleaseEntry{
@@ -205,7 +197,8 @@ func TestSerial(t *testing.T) {
 							nil,
 						},
 					},
-				})
+				},
+				Atlas)
 			So(err, ShouldBeNil)
 			So(jsonPretty(msg), ShouldResemble,
 				`{
@@ -333,6 +326,6 @@ func TestSerial(t *testing.T) {
 
 func jsonPretty(s []byte) string {
 	var out bytes.Buffer
-	json.Indent(&out, s, "", "\t")
+	stdjson.Indent(&out, s, "", "\t")
 	return out.String()
 }

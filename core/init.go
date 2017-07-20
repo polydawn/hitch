@@ -15,24 +15,24 @@ func Init(ui UI) ExitCode {
 	switch err.(type) {
 	case nil:
 		fmt.Fprintf(ui.Stderr, "cannot init new hitch.db -- one already exists, rooted at %q!\n", dbctrl.BasePath)
-		return 5
+		return EXIT_INPROGRESS
 	case *locator.ErrNotFound:
 		// pass!
 	default:
 		fmt.Fprintf(ui.Stderr, "error while searching for hitch.db -- %s\n", err)
-		return 7
+		return EXIT_WEIRDFS
 	}
 
 	// Make hitch.db sigil file in cwd.
 	cwd, err := os.Getwd()
 	if err != nil {
 		fmt.Fprintf(ui.Stderr, "error while creating hitch.db -- %s\n", err)
-		return 8
+		return EXIT_WEIRDFS
 	}
 	_, err = db.Create(cwd)
 	if err != nil {
 		fmt.Fprintf(ui.Stderr, "error while creating hitch.db -- %s\n", err)
-		return 8
+		return EXIT_WEIRDFS
 	}
-	return 0
+	return EXIT_SUCCESS
 }

@@ -8,6 +8,7 @@
 package rdef
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/polydawn/refmt/obj/atlas"
@@ -27,6 +28,14 @@ type WareID struct {
 	Hash string
 }
 
+func ParseWareID(x string) (WareID, error) {
+	ss := strings.Split(x, ":")
+	if len(ss) != 2 {
+		return WareID{}, fmt.Errorf("wareIDs always have a single colon (they are of form <type:hash>)")
+	}
+	return WareID{ss[0], ss[1]}, nil
+}
+
 var WareID_AtlasEntry = atlas.BuildEntry(WareID{}).Transform().
 	TransformMarshal(atlas.MakeMarshalTransformFunc(
 		func(x WareID) (string, error) {
@@ -34,8 +43,7 @@ var WareID_AtlasEntry = atlas.BuildEntry(WareID{}).Transform().
 		})).
 	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
 		func(x string) (WareID, error) {
-			ss := strings.Split(x, ":")
-			return WareID{ss[0], ss[1]}, nil
+			return ParseWareID(x)
 		})).
 	Complete()
 

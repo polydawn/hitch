@@ -9,6 +9,8 @@
 package stage
 
 import (
+	"bytes"
+	stdjson "encoding/json"
 	"io"
 	"os"
 	"path/filepath"
@@ -68,8 +70,14 @@ func (stageCtrl *Controller) Save() error {
 }
 
 func (stageCtrl *Controller) flush(w io.Writer) error {
-	return json.NewMarshallerAtlased(w, api.Atlas).
-		Marshal(stageCtrl.Catalog)
+	msg, err := json.MarshalAtlased(stageCtrl.Catalog, api.Atlas)
+	if err != nil {
+		return err
+	}
+	var buf bytes.Buffer
+	stdjson.Indent(&buf, msg, "", "\t")
+	_, err = buf.WriteTo(w)
+	return err
 }
 
 func Load(dbctrl *db.Controller, stagePath string) (*Controller, error) {

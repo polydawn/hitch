@@ -36,13 +36,18 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
 	}
 
 	// Load stage state.  Staging must have already been started by `hitch release start`.
-	stageCtrl, err := stage.Load(dbctrl, stage.DefaultPath)
+	stageCtrl, err2 := stage.Load(dbctrl, stage.DefaultPath)
 	switch {
-	case err == nil:
+	case err2 == nil:
 		// pass!
-	default:
+	case err2.Category == stage.ErrIO:
 		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
-		return 18 // FIXME : the usual golang errors problems: whether this is IO or marshalling issues is not clear
+		return EXIT_WEIRDFS
+	case err2.Category == stage.ErrStorageCorrupt:
+		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
+		return EXIT_CORRUPT
+	default:
+		panic(err2)
 	}
 
 	// Insert the label.  Then tell the stage state to save itself.
@@ -54,7 +59,7 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
 	stageCtrl.Catalog.Releases[0].Items = items
 	if err := stageCtrl.Save(); err != nil {
 		fmt.Fprintf(ui.Stderr, "error while saving staged state -- %s\n", err)
-		return 18 // FIXME : the usual golang errors problems: whether this is IO or marshalling issues is not clear
+		return EXIT_WEIRDFS
 	}
 
 	return EXIT_SUCCESS

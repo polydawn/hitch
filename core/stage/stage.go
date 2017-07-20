@@ -13,7 +13,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/polydawn/refmt"
+	"github.com/polydawn/refmt/json"
 
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
@@ -68,7 +68,7 @@ func (stageCtrl *Controller) Save() error {
 }
 
 func (stageCtrl *Controller) flush(w io.Writer) error {
-	return refmt.NewAtlasedJsonEncoder(w, api.Atlas).
+	return json.NewMarshallerAtlased(w, api.Atlas).
 		Marshal(stageCtrl.Catalog)
 }
 
@@ -87,5 +87,6 @@ func Load(dbctrl *db.Controller, stagePath string) (*Controller, error) {
 }
 
 func (stageCtrl *Controller) load(r io.Reader) error {
-	return nil // TODO deserialize
+	return json.NewUnmarshallerAtlased(r, api.Atlas).
+		Unmarshal(&stageCtrl.Catalog)
 }

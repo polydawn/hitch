@@ -2,38 +2,40 @@ package api
 
 import (
 	"bytes"
-	"encoding/json"
+	stdjson "encoding/json"
 	"testing"
 
 	"github.com/polydawn/refmt"
+	"github.com/polydawn/refmt/json"
 	. "github.com/smartystreets/goconvey/convey"
 
 	"go.polydawn.net/hitch/api/rdef"
 )
 
 func TestSerial(t *testing.T) {
-
 	Convey("ReleaseItemID serialization", t, func() {
-		msg, err := refmt.JsonEncodeAtlased(Atlas,
-			ReleaseItemID{"a", "b", "c"})
+		msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
+			ReleaseItemID{"a", "b", "c"},
+			Atlas)
 		So(err, ShouldBeNil)
 		So(string(msg), ShouldResemble, `"a:b:c"`)
 		var reheat string
-		So(json.Unmarshal(msg, &reheat), ShouldBeNil)
+		So(stdjson.Unmarshal(msg, &reheat), ShouldBeNil)
 		So(reheat, ShouldResemble, "a:b:c")
 	})
 	Convey("Catalog serialization", t, func() {
 		Convey("empty catalog, no releases", func() {
-			msg, err := refmt.JsonEncodeAtlased(Atlas,
+			msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
 				Catalog{
 					"cname",
 					[]ReleaseEntry{},
-				})
+				},
+				Atlas)
 			So(err, ShouldBeNil)
 			So(string(msg), ShouldResemble, `{"name":"cname","releases":[]}`)
 		})
 		Convey("short catalog: one release, no replay", func() {
-			msg, err := refmt.JsonEncodeAtlased(Atlas,
+			msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
 				Catalog{
 					"cname",
 					[]ReleaseEntry{
@@ -49,7 +51,8 @@ func TestSerial(t *testing.T) {
 							nil,
 						},
 					},
-				})
+				},
+				Atlas)
 			So(err, ShouldBeNil)
 			So(jsonPretty(msg), ShouldResemble,
 				`{
@@ -72,7 +75,7 @@ func TestSerial(t *testing.T) {
 		})
 
 		Convey("medium catalog: multiple releases, interesting replays", func() {
-			msg, err := refmt.JsonEncodeAtlased(Atlas,
+			msg, err := refmt.MarshalAtlased(json.EncodeOptions{},
 				Catalog{
 					"cname",
 					[]ReleaseEntry{
@@ -194,7 +197,8 @@ func TestSerial(t *testing.T) {
 							nil,
 						},
 					},
-				})
+				},
+				Atlas)
 			So(err, ShouldBeNil)
 			So(jsonPretty(msg), ShouldResemble,
 				`{
@@ -322,6 +326,6 @@ func TestSerial(t *testing.T) {
 
 func jsonPretty(s []byte) string {
 	var out bytes.Buffer
-	json.Indent(&out, s, "", "\t")
+	stdjson.Indent(&out, s, "", "\t")
 	return out.String()
 }

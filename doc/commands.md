@@ -8,8 +8,8 @@ hitch create catalog <catalogname>
 hitch release start <catalogname> <releasename>
 hitch release add-step <stepname> <formula.filename> [<importlist.filename>]
 hitch release add-runrecord <stepname> <runrecord.filename>...
-hitch release add-label <labelname> <wareID>
-hitch release add-label <labelname> "wire:<stepname>:<outputSlot>"
+hitch release add-item <itemname> <wareID>
+hitch release add-item <itemname> "wire:<stepname>:<outputSlot>"
 hitch release metadata set <key>=<value>
 hitch release commit
 hitch release reset
@@ -20,11 +20,11 @@ hitch release reset
 ```
 hitch show <catalogname>
 hitch show <catalogname>:<releasename>
-hitch show <catalogname>:<releasename>:<labelname>
-hitch show-latest <catalogname> [<labelname>]
+hitch show <catalogname>:<releasename>:<itemname>
+hitch show-latest <catalogname> [<itemname>]
 hitch list catalogs
 hitch list releases <catalogname>
-hitch list labels <catalogname>:<releasename>
+hitch list items <catalogname>:<releasename>
 hitch show-replay <catalogname>:<releasename>
 ```
 
@@ -50,9 +50,9 @@ TODO
 
 `hitch show` commands dump json of all object info under your request.
 
-- `hitch show someproject` dumps the top-level project name, release keys, and description, *all* the releases, all the metadata for each release, and all the release wares and their labels.
+- `hitch show someproject` dumps the top-level project name, release keys, and description, *all* the releases, all the metadata for each release, and all the release items: the wareIDs and their labels.
 - `hitch show someproject:somerelease` dumps the information for the named release: all the metadata, and all the wares and their labels in that release.
-- `hitch show someproject:somerelease:somelabel` emits a single string: the WareID for that specific item.
+- `hitch show someproject:somerelease:someitem` emits a single string: the WareID with for that specific label.
 
 The `hitch show-latest` command will behave as per the second or third forms of `hitch show`, but selecting the latest release in the named project catalog.
 (Be careful using this command: it is for convenience and debugging; if you can specify your desired versions in any better way than this, please do so!)
@@ -63,7 +63,13 @@ the import information of which other catalogs and releases provided those WareI
 and the run records and resulting WareIDs those formulas built.
 (Replay instructions are not included in any of the `hitch show` command outputs, due to verbosity.)
 
-The `hitch list` commands emits a list of releases in a catalog, or labels in a release in a catalog.  `hitch list` defaults to a simple line-separated strings format, easy to loop over in shell scripting.  (The output of `hitch list` is a subset of `hitch show`.)
+The `hitch list` commands show a list of names: either
+all the catalogs in the database,
+all the releases in a catalog,
+or all the item labels in a release in a catalog.
+`hitch list` defaults to a simple line-separated strings format,
+easy to loop over in shell scripting.
+(The output of `hitch list` is a subset of `hitch show`.)
 
 ### Exchanging catalogs with other hitch datasets:
 

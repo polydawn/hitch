@@ -30,9 +30,9 @@ var (
 	releaseAddStep_NameArg    = releaseAddStepCmd.Arg("name", "The name to assign this new step.").Required().String()
 	releaseAddStep_FormulaArg = releaseAddStepCmd.Arg("formula", "The path to the formula file that runs this step.").Required().String()
 	releaseAddStep_ImportsArg = releaseAddStepCmd.Arg("imports", "The path to an imports file which explains the catalogs and release names for wares in the step formula.").String()
-	releaseAddLabelCmd        = releaseCmd.Command("add-label", "Add a labeled ware to the set of data in the release.")
-	releaseAddLabel_LabelArg  = releaseAddLabelCmd.Arg("labelName", "The label to add to the set of released wares.").Required().String()
-	releaseAddLabel_WareArg   = releaseAddLabelCmd.Arg("ware", "The WareID this label will be mapped to.").Required().String()
+	releaseAddItemCmd         = releaseCmd.Command("add-item", "Add a ware to the set of data in the release, and assigns it a name.")
+	releaseAddItem_ItemArg    = releaseAddItemCmd.Arg("itemName", "The label to map the ware.").Required().String()
+	releaseAddItem_WareArg    = releaseAddItemCmd.Arg("ware", "The WareID this label will be mapped to.").Required().String()
 
 	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
@@ -69,8 +69,8 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode Ex
 			return core.Init(ui)
 		case releaseStartCmd.FullCommand():
 			return core.ReleaseStart(ui, *releaseStart_CatalogArg, *releaseStart_ReleaseArg)
-		case releaseAddLabelCmd.FullCommand():
-			return core.ReleaseAddLabel(ui, *releaseAddLabel_LabelArg, *releaseAddLabel_WareArg)
+		case releaseAddItemCmd.FullCommand():
+			return core.ReleaseAddItem(ui, *releaseAddItem_ItemArg, *releaseAddItem_WareArg)
 		default:
 			panic(fmt.Errorf("hitch: unhandled command %q", cmd))
 		}

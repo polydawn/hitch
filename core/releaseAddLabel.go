@@ -1,8 +1,6 @@
 package core
 
 import (
-	"fmt"
-
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/api/rdef"
 	"go.polydawn.net/hitch/core/db"
@@ -11,18 +9,16 @@ import (
 	"go.polydawn.net/hitch/lib/locator"
 )
 
-func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
+func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) error {
 	// Find hitch.db root.
 	dbctrl, err := db.LoadByCwd()
 	switch err.(type) {
 	case nil:
 		// pass!
 	case *locator.ErrNotFound:
-		fmt.Fprintf(ui.Stderr, "no hitch.db found -- try `hitch init` first?\n")
-		return EXIT_DBNOTFOUND
+		return Errorf(ErrDBNotFound, "no hitch.db found -- try `hitch init` first?")
 	default:
-		fmt.Fprintf(ui.Stderr, "error while searching for hitch.db -- %s\n", err)
-		return EXIT_WEIRDFS
+		return Errorf(ErrFS, "error while searching for hitch.db -- %s", err)
 	}
 
 	// Additional args parsery.
@@ -32,8 +28,7 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
 	labelName := api.ItemLabel(labelNameStr)
 	wareID, err := rdef.ParseWareID(wareStr)
 	if err != nil {
-		fmt.Fprintf(ui.Stderr, "invalid ware reference -- %s\n", err)
-		return EXIT_BADARGS
+		return Errorf(ErrBadArgs, "invalid ware reference -- %s", err)
 	}
 
 	// Load stage state.  Staging must have already been started by `hitch release start`.
@@ -42,11 +37,9 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
 	case nil:
 		// pass!
 	case stage.ErrIO:
-		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
-		return EXIT_WEIRDFS
+		return Errorf(ErrFS, "error while reading staged state -- %s", err)
 	case stage.ErrStorageCorrupt:
-		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
-		return EXIT_CORRUPT
+		return Errorf(ErrCorruptState, "error while reading staged state -- %s", err)
 	default:
 		panic(err)
 	}
@@ -59,9 +52,8 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
 	items[labelName] = wareID
 	stageCtrl.Catalog.Releases[0].Items = items
 	if err := stageCtrl.Save(); err != nil {
-		fmt.Fprintf(ui.Stderr, "error while saving staged state -- %s\n", err)
-		return EXIT_WEIRDFS
+		return Errorf(ErrFS, "error while saving staged state -- %s", err)
 	}
 
-	return EXIT_SUCCESS
+	return nil
 }

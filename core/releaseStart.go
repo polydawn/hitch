@@ -1,28 +1,26 @@
 package core
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/core/stage"
+	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
 )
 
-func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) ExitCode {
+func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) error {
 	// Find hitch.db root.
 	dbctrl, err := db.LoadByCwd()
 	switch err.(type) {
 	case nil:
 		// pass!
 	case *locator.ErrNotFound:
-		fmt.Fprintf(ui.Stderr, "no hitch.db found -- try `hitch init` first?\n")
-		return EXIT_DBNOTFOUND
+		return Errorf(ErrDBNotFound, "no hitch.db found -- try `hitch init` first?")
 	default:
-		fmt.Fprintf(ui.Stderr, "error while searching for hitch.db -- %s\n", err)
-		return EXIT_WEIRDFS
+		return Errorf(ErrFS, "error while searching for hitch.db -- %s", err)
 	}
 
 	// Check for staging file.  Reject command if staging file already exists.
@@ -30,13 +28,11 @@ func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) ExitCode {
 	_, err = os.Stat(filepath.Join(dbctrl.BasePath, stage.DefaultPath))
 	switch {
 	case err == nil:
-		fmt.Fprintf(ui.Stderr, "a release is already in progress!\nif this doesn't sound right, use 'hitch release reset' to discard the information (or, 'rm -r _stage').\n")
-		return EXIT_INPROGRESS
+		return Errorf(ErrInProgress, "a release is already in progress!\nif this doesn't sound right, use 'hitch release reset' to discard the information (or, 'rm -r _stage').")
 	case os.IsNotExist(err):
 		// pass!
 	default:
-		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
-		return EXIT_WEIRDFS
+		return Errorf(ErrFS, "error while reading staged state -- %s", err)
 	}
 
 	// Validate names fit within acceptable string ranges.
@@ -57,9 +53,8 @@ func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) ExitCode {
 	// Initialize stage state on disk.
 	_, err = stage.Create(dbctrl, stage.DefaultPath, catalogName, releaseName)
 	if err != nil {
-		fmt.Fprintf(ui.Stderr, "error while initializing stage state -- %s\n", err)
-		return EXIT_WEIRDFS
+		return Errorf(ErrFS, "error while initializing stage state -- %s", err)
 	}
 
-	return EXIT_SUCCESS
+	return nil
 }

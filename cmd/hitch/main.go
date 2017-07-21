@@ -37,14 +37,14 @@ var (
 	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
 
-func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode core.ExitCode) {
+func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode ExitCode) {
 	app.HelpFlag.Short('h')
 
 	// Rigging kingpin to use our in/out/err/code.
 	var kingpinTerminate bool
 	app.Terminate(func(status int) {
 		kingpinTerminate = true
-		exitCode = core.ExitCode(status)
+		exitCode = ExitCode(status)
 	})
 	app.UsageWriter(stderr)
 	app.ErrorWriter(stderr)
@@ -63,18 +63,21 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode co
 	ui := core.UI{stdin, stdout, stderr}
 
 	// Switch for command to invoke.
-	switch cmd {
-	case initCmd.FullCommand():
-		return core.Init(ui)
-	case releaseStartCmd.FullCommand():
-		return core.ReleaseStart(ui, *releaseStart_CatalogArg, *releaseStart_ReleaseArg)
-	case releaseAddLabelCmd.FullCommand():
-		return core.ReleaseAddLabel(ui, *releaseAddLabel_LabelArg, *releaseAddLabel_WareArg)
-	case releaseAddStepCmd.FullCommand():
-		fmt.Fprintf(stdout, "whee!\n%q\n%q\n%q\n", *releaseAddStep_NameArg, *releaseAddStep_FormulaArg, *releaseAddStep_ImportsArg)
-		return 0
-	default:
-		panic(fmt.Errorf("hitch: unhandled command %q", cmd))
-		return 1
+	err = func() error {
+		switch cmd {
+		case initCmd.FullCommand():
+			return core.Init(ui)
+		case releaseStartCmd.FullCommand():
+			return core.ReleaseStart(ui, *releaseStart_CatalogArg, *releaseStart_ReleaseArg)
+		case releaseAddLabelCmd.FullCommand():
+			return core.ReleaseAddLabel(ui, *releaseAddLabel_LabelArg, *releaseAddLabel_WareArg)
+		default:
+			panic(fmt.Errorf("hitch: unhandled command %q", cmd))
+		}
+	}()
+	if err == nil {
+		return EXIT_SUCCESS
 	}
+	fmt.Fprintf(stderr, "%s\n", err)
+	return mapToExitCode(err)
 }

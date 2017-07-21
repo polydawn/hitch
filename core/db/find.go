@@ -1,33 +1,28 @@
 package db
 
 import (
-	"os"
-
 	"go.polydawn.net/hitch/lib/locator"
 )
 
-const workspaceFilename = ".hitch"
+const workspaceName = "hitch.db"
 
 func LoadByPath(startPath string) (*Controller, error) {
-	rootDir, f, err := locator.FindByFilename(startPath, workspaceFilename)
+	baseDir, err := locator.FindByDirname(startPath, workspaceName)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
-	return load(rootDir, f)
+	return load(baseDir)
 }
 
 func LoadByCwd() (*Controller, error) {
-	rootDir, f, err := locator.FindByFilenameFromCwd(workspaceFilename)
+	baseDir, err := locator.FindByDirnameFromCwd(workspaceName)
 	if err != nil {
 		return nil, err
 	}
-	defer f.Close()
-	return load(rootDir, f)
+	return load(baseDir)
 }
 
-func load(basePath string, f *os.File) (*Controller, error) {
+func load(basePath string) (*Controller, error) {
 	ctrl := &Controller{BasePath: basePath}
-	// When we actually have a main info file: parse it here.
 	return ctrl, nil
 }

@@ -1,6 +1,8 @@
 package db
 
 import (
+	"bytes"
+	stdjson "encoding/json"
 	"os"
 	"path/filepath"
 	"strings"
@@ -40,4 +42,34 @@ func (dbctrl *Controller) LoadCatalog(catalogName api.CatalogName) (*api.Catalog
 	err = json.NewUnmarshallerAtlased(f, api.Atlas).
 		Unmarshal(&catalog)
 	return &catalog, Errorw(ErrStorageCorrupt, err)
+}
+
+/*
+	Save a catalog object into the db.
+
+	If the extended fields (e.g. replay) are set, they will also be saved;
+	if absent, those components on disk will not be modified.
+*/
+func (dbctrl *Controller) SaveCatalog(catalog *api.Catalog) error {
+	catalogNameChunks := strings.Split(string(catalog.Name), "/")
+	catalogPath := filepath.Join(append([]string{dbctrl.BasePath}, catalogNameChunks...)...)
+
+	if err := os.MkdirAll(catalogPath, 0755); err != nil {
+		return Errorw(ErrIO, err)
+	}
+	f, err := os.OpenFile(filepath.Join(catalogPath, "catalog.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
+	if err != nil {
+		return Errorw(ErrIO, err)
+	}
+	defer f.Close()
+
+	msg, err := json.MarshalAtlased(catalog, api.Atlas)
+	if err != nil {
+		panic(err) // marshalling into a buffer shouldn't fail!
+	}
+	var buf bytes.Buffer
+	stdjson.Indent(&buf, msg, "", "\t")
+	buf.WriteString("\n")
+	_, err = buf.WriteTo(f)
+	return Errorw(ErrIO, err)
 }

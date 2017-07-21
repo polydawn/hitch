@@ -41,10 +41,23 @@ func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) error {
 	releaseName := api.ReleaseName(releaseNameStr)
 
 	// Check for catalog already existing.  Reject if not (this is fat-finger avoidance).
-	// TODO : come back here after writing more db inspection methods.
+	catalog, err := dbctrl.LoadCatalog(catalogName)
+	switch Category(err) {
+	case nil:
+		// pass!
+	case db.ErrNotFound:
+		return Errorf(ErrDataNotFound, "a catalog must exist before you can commit a release to it! -- %s", err)
+	case db.ErrIO:
+		return Errorf(ErrFS, "error while reading db -- %s", err)
+	case db.ErrStorageCorrupt:
+		return Errorf(ErrCorruptState, "error while reading db -- %s", err)
+	default:
+		panic(err)
+	}
 
 	// Check for catalog+release already existing.  Reject if released before.
 	// TODO : come back here after writing more db inspection methods.
+	_ = catalog
 
 	// If catalog has signing keys set up, check that we have those keys.
 	// FUTURE : signing keys are in the roadmap, but a fair ways off.

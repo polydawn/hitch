@@ -41,7 +41,6 @@ func ReleaseCommit(ui UI) error {
 		// pass!
 	case db.ErrNotFound:
 		return Errorf(ErrCorruptState, "a catalog must exist before you can commit a release to it! -- %s", err)
-		// FIXME : we're not enforcing that invariant at start time yet...
 	case db.ErrIO:
 		return Errorf(ErrFS, "error while reading db -- %s", err)
 	case db.ErrStorageCorrupt:

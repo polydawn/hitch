@@ -40,7 +40,7 @@ func CatalogCreate(ui UI, catalogNameStr string) error {
 
 	// Initialize the clean new catalog.
 	// Command the DB to save it.
-	catalog := &api.Catalog{
+	catalog := api.Catalog{
 		Name: catalogName,
 	}
 	err = dbctrl.SaveCatalog(catalog)

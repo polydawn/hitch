@@ -25,23 +25,23 @@ type Controller struct {
 	because that stuff may be much larger than many callers need;
 	use the other db methods to ask for it explicitly.
 */
-func (dbctrl *Controller) LoadCatalog(catalogName api.CatalogName) (*api.Catalog, error) {
+func (dbctrl *Controller) LoadCatalog(catalogName api.CatalogName) (api.Catalog, error) {
 	catalogNameChunks := strings.Split(string(catalogName), "/")
 	catalogPath := filepath.Join(append([]string{dbctrl.BasePath}, catalogNameChunks...)...)
 
 	f, err := os.OpenFile(filepath.Join(catalogPath, "catalog.json"), os.O_RDONLY, 0)
 	if err != nil {
 		if os.IsNotExist(err) {
-			return nil, Errorf(ErrNotFound, "no catalog named %q in db", catalogName)
+			return api.Catalog{}, Errorf(ErrNotFound, "no catalog named %q in db", catalogName)
 		}
-		return nil, Errorw(ErrIO, err)
+		return api.Catalog{}, Errorw(ErrIO, err)
 	}
 	defer f.Close()
 
 	var catalog api.Catalog
 	err = json.NewUnmarshallerAtlased(f, api.Atlas).
 		Unmarshal(&catalog)
-	return &catalog, Errorw(ErrStorageCorrupt, err)
+	return catalog, Errorw(ErrStorageCorrupt, err)
 }
 
 /*
@@ -50,7 +50,7 @@ func (dbctrl *Controller) LoadCatalog(catalogName api.CatalogName) (*api.Catalog
 	If the extended fields (e.g. replay) are set, they will also be saved;
 	if absent, those components on disk will not be modified.
 */
-func (dbctrl *Controller) SaveCatalog(catalog *api.Catalog) error {
+func (dbctrl *Controller) SaveCatalog(catalog api.Catalog) error {
 	catalogNameChunks := strings.Split(string(catalog.Name), "/")
 	catalogPath := filepath.Join(append([]string{dbctrl.BasePath}, catalogNameChunks...)...)
 

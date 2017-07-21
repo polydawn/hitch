@@ -44,4 +44,31 @@ func Test(t *testing.T) {
 			})
 		})
 	})
+	Convey("Release staging operations", t, func() {
+		WithChdirTmpdir(func() {
+			So(Init(ui), ShouldErrorWith, nil)
+
+			Convey("setting up a simple release with several items, happy path", func() {
+				So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-foo", "tar:asdfasdf"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-bar", "tar:asdfasdf"), ShouldErrorWith, nil)
+				Convey("adding a clearly invalid wareID should be rejected", func() {
+					So(ReleaseAddItem(ui, "label-bar", "not a ware id!"), ShouldErrorWith, ErrBadArgs)
+				})
+				// TODO : overwrite detection not implemented yet!
+				//	Convey("overwriting an item should be rejected", func() {
+				//		So(ReleaseAddItem(ui, "label-bar", "tar:asdfasdf"), ShouldErrorWith, ErrOverwrite)
+				//	})
+			})
+			Convey("starting a release twice should be rejected", func() {
+				So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, nil)
+				So(ReleaseStart(ui, "xy", "zw"), ShouldErrorWith, ErrInProgress)
+				// TODO : `hitch release reset` not implemented yet!
+				//	Convey("reseting it should allow starting over", func() {
+				//		So(ReleaseReset(ui), ShouldErrorWith, nil)
+				//		So(ReleaseStart(ui, "xy", "zw"), ShouldErrorWith, nil)
+				//	})
+			})
+		})
+	})
 }

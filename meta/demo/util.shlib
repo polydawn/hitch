@@ -1,0 +1,90 @@
+## This is a bash shell library file.
+## It is meant to be "sourced".
+## This is not mean to be executable.
+
+##
+## Color palette codes.
+##
+color_red="\033[0;31m"
+color_green="\033[0;32m"
+color_brown="\033[0;33m"
+color_yellow="\033[1;33m"
+color_cerulean="\033[1;34m"
+color_brighten="\033[1m"
+color_unbrighten="\033[22m"
+color_underline="\033[4m"
+color_ununderline="\033[24m"
+color_none="\033[0m"
+## and now some semantic ones:
+color_scream=$color_red
+color_section=$color_cerulean
+color_command=$color_yellow   ## highlighting for a command
+color_prompt=$color_brown     ## highlighting used for interactive prompts
+
+
+##
+## Utils -- gtfo
+##
+function die {
+	msg="$1"
+	>&2 echo "${color_scream}${msg}${color_none}"
+}
+
+
+
+##
+## Utils -- output fmting
+##
+function prefix { sed 's/^/'"$1"'/' ; }
+function indent { prefix "${INDENT:-\t}" ; }
+function highlight {
+        keyword="$1" ; color="$2"
+        sed "$(printf "%b" "s/${keyword}/${color}&${color_none}/")" -
+}
+
+
+
+##
+## Some more opinionated helpful output fmters.
+##
+function loudly { ## Give a full command as args.
+	cmd="$@"
+	>&2 echo -e "${color_prompt}> ${color_command}${cmd}${color_none}"
+	(
+		set +eo pipefail
+		$cmd 2>&1| indent
+		code=$PIPESTATUS
+		if [ 0 -eq $code ]; then exit; fi
+		>&2 echo -ne \
+			"${color_scream}${color_underline}!!!error!!!${color_ununderline}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈${color_none}" \
+			"\n${color_scream}${color_underline}!!!error!!!${color_ununderline}" \
+			"  \"${color_prompt}${cmd}${color_scream}\" died unexpectedly" \
+			"with code ${color_brighten}$code${color_unbrighten}${color_none}" \
+			"\n${color_scream}${color_underline}!!!error!!!${color_ununderline}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈${color_none}\n"
+		exit $code
+	)
+	return $PIPESTATUS
+}
+function section { ## Give a before and after string; Pipe in a subshell's worth of stuff (using `loudly`'s inside that works nicely too).
+	before=$(echo "${1:-}" | prefix ' ')
+	after=$(echo "${2:-}" | prefix ' ')
+	echo
+	echo -e "${color_cerulean}${before}${color_none}"
+	echo -e "${color_cerulean}┌──────────────┈${color_none}"
+	cat - | prefix ''
+	echo -e "${color_cerulean}└──────────────┈${color_none}"
+	echo -e "${color_cerulean}${after}${color_none}"
+	echo
+}
+
+
+
+##
+## Utils -- pause/prompt funcs, for (slightly) interactive demos
+##
+if [ "${1:-}" != "-t" ]; then straight=true; fi
+function awaitack {
+	[ "${straight:-}" != true ] && return;
+	echo -ne "\n${color_brown}waiting for ye to hit enter, afore the voyage heave up anchor and make headway${color_none}"
+	read -es && echo -ne "\E[F\E[2K\r"
+}

@@ -19,3 +19,4 @@ action:
 			./goad fmt
 			./goad install
 			./goad test
+			./goad demo

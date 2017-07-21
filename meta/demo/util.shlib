@@ -82,7 +82,7 @@ function section { ## Give a before and after string; Pipe in a subshell's worth
 ##
 if [ "${1:-}" != "-t" ]; then straight=true; fi
 function awaitack {
-	[ "$straight" != true ] && return;
+	[ "${straight:-}" != true ] && return;
 	echo -ne "\n${color_brown}waiting for ye to hit enter, afore the voyage heave up anchor and make headway${color_none}"
 	read -es && echo -ne "\E[F\E[2K\r"
 }

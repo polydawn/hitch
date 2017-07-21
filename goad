@@ -82,6 +82,15 @@ else
 			exit 4
 		}
 		;;
+	demo)
+		echo -e "\E[1;32mstarting demo (non-interactive mode)...\E[0;m\n"
+		./demo.sh -t && {
+			echo -e "\n\E[1;32mdemo done; all green.\E[0;m"
+		} || {
+			echo -e "\n\E[1;41mdemo failed!\E[0;m"
+			exit 4
+		}
+		;;
 	install)
 		go install -ldflags "$LDFLAGS" "$cmd"
 		;;

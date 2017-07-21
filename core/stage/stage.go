@@ -37,7 +37,7 @@ type Controller struct {
 func Create(
 	dbctrl *db.Controller, stagePath string,
 	catalogName api.CatalogName, releaseName api.ReleaseName,
-) (*Controller, *Error) {
+) (*Controller, error) {
 	err := os.MkdirAll(filepath.Join(dbctrl.BasePath, stagePath), 0755)
 	if err != nil {
 		return nil, Errorw(ErrIO, err)
@@ -61,7 +61,7 @@ func Create(
 	return stageCtrl, stageCtrl.flush(f)
 }
 
-func (stageCtrl *Controller) Save() *Error {
+func (stageCtrl *Controller) Save() error {
 	f, err := os.OpenFile(filepath.Join(stageCtrl.dbctrl.BasePath, stageCtrl.stagePath, "stage.json"), os.O_WRONLY|os.O_TRUNC, 0)
 	if err != nil {
 		return Errorw(ErrIO, err)
@@ -70,7 +70,7 @@ func (stageCtrl *Controller) Save() *Error {
 	return stageCtrl.flush(f)
 }
 
-func (stageCtrl *Controller) flush(w io.Writer) *Error {
+func (stageCtrl *Controller) flush(w io.Writer) error {
 	msg, err := json.MarshalAtlased(stageCtrl.Catalog, api.Atlas)
 	if err != nil {
 		panic(err) // marshalling into a buffer shouldn't fail!
@@ -81,7 +81,7 @@ func (stageCtrl *Controller) flush(w io.Writer) *Error {
 	return Errorw(ErrIO, err)
 }
 
-func Load(dbctrl *db.Controller, stagePath string) (*Controller, *Error) {
+func Load(dbctrl *db.Controller, stagePath string) (*Controller, error) {
 	f, err := os.OpenFile(filepath.Join(dbctrl.BasePath, stagePath, "stage.json"), os.O_RDONLY, 0)
 	if err != nil {
 		return nil, Errorw(ErrIO, err)
@@ -95,7 +95,7 @@ func Load(dbctrl *db.Controller, stagePath string) (*Controller, *Error) {
 	return stageCtrl, stageCtrl.load(f)
 }
 
-func (stageCtrl *Controller) load(r io.Reader) *Error {
+func (stageCtrl *Controller) load(r io.Reader) error {
 	err := json.NewUnmarshallerAtlased(r, api.Atlas).
 		Unmarshal(&stageCtrl.Catalog)
 	return Errorw(ErrStorageCorrupt, err)

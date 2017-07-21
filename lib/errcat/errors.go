@@ -76,11 +76,11 @@ func (e Error) Error() string {
 	return e.Msg
 }
 
-func Errorf(category interface{}, format string, args ...interface{}) *Error {
+func Errorf(category interface{}, format string, args ...interface{}) error {
 	return &Error{category, fmt.Sprintf(format, args...), nil}
 }
 
-func Errorw(category interface{}, cause error) *Error {
+func Errorw(category interface{}, cause error) error {
 	if cause == nil {
 		return nil
 	}

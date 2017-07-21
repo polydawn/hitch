@@ -18,8 +18,10 @@ import (
 	The release name is a string attached to the release;
 	it's specified by the releaser when creating a new release.
 
-	The item label is a selector used to select a specific ware when there is
+	The item name is a selector used to select a specific ware when there is
 	more than one ware published in a single atomic release.
+	Usually these are used to specify things like a host architecture for binaries,
+	though keywords like "src" and "docs" are also common.
 	The set of items in a release is considered immutable once the release is published.
 	Generally, there's an expectation in the ecosystem that the set of item labels available
 	from each release will be the same: e.g., when upgrading from an older version
@@ -29,24 +31,24 @@ import (
 type (
 	CatalogName string // oft like "project.org/thing".  The first part of an identifying triple.
 	ReleaseName string // oft like "1.8".  The second part of an identifying triple.
-	ItemLabel   string // oft like "linux-amd64" or "docs".  The third part of an identifying triple.
+	ItemName    string // oft like "linux-amd64" or "docs".  The third part of an identifying triple.
 )
 
 type ReleaseItemID struct {
 	CatalogName
 	ReleaseName
-	ItemLabel
+	ItemName
 }
 
 var ReleaseItemID_AtlasEntry = atlas.BuildEntry(ReleaseItemID{}).Transform().
 	TransformMarshal(atlas.MakeMarshalTransformFunc(
 		func(x ReleaseItemID) (string, error) {
-			return string(x.CatalogName) + ":" + string(x.ReleaseName) + ":" + string(x.ItemLabel), nil
+			return string(x.CatalogName) + ":" + string(x.ReleaseName) + ":" + string(x.ItemName), nil
 		})).
 	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
 		func(x string) (ReleaseItemID, error) {
 			ss := strings.Split(x, ":")
-			return ReleaseItemID{CatalogName(ss[0]), ReleaseName(ss[1]), ItemLabel(ss[2])}, nil
+			return ReleaseItemID{CatalogName(ss[0]), ReleaseName(ss[1]), ItemName(ss[2])}, nil
 		})).
 	Complete()
 
@@ -74,7 +76,7 @@ var Catalog_AtlasEntry = atlas.BuildEntry(Catalog{}).StructMap().Autogenerate().
 
 type ReleaseEntry struct {
 	Name     ReleaseName
-	Items    map[ItemLabel]rdef.WareID
+	Items    map[ItemName]rdef.WareID
 	Metadata map[string]string
 	Hazards  map[string]string
 	Replay   *Replay
@@ -89,7 +91,7 @@ type Replay struct {
 	// recursive audits can work automatically.
 	Steps map[StepName]Step
 
-	// Map wiring the ItemLabels in the release outputs to a step and output slot
+	// Map wiring the ItemNames in the release outputs to a step and output slot
 	// within that step's formula.
 	//
 	// Implicitly, all the ReleaseItemID's tend to be of "wire" type.
@@ -101,9 +103,9 @@ type Replay struct {
 	// one RunRecord, then the wired output slot MUST have resulted in the same WareID
 	// hash all the RunRecords.
 	// Furthermore, the WareID in those RunRecords must match the WareID which
-	// is directly listed for the ItemLabel in the the release entry; otherwise,
+	// is directly listed for the ItemName in the the release entry; otherwise,
 	// the replay isn't describing the same thing released!
-	Products map[ItemLabel]ReleaseItemID
+	Products map[ItemName]ReleaseItemID
 }
 
 var Replay_AtlasEntry = atlas.BuildEntry(Replay{}).StructMap().Autogenerate().Complete()
@@ -116,7 +118,7 @@ type Step struct {
 	// The formula may have inputs that are not explained here (though tools
 	// should usually emit a warning about such unexplained blobs).
 	//
-	// Imports may either be the full `{CatalogName,ReleaseName,ItemLabel}` tuple
+	// Imports may either be the full `{CatalogName,ReleaseName,ItemName}` tuple
 	// referring to another catalog, or, `{"wire",StepName,OutputSlot}`.
 	//
 	// In the "wire" mode, the reference is interpreted as another step in this replay.

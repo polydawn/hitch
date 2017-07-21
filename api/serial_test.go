@@ -40,7 +40,7 @@ func TestSerial(t *testing.T) {
 					"cname",
 					[]ReleaseEntry{
 						{"1.0",
-							map[ItemLabel]rdef.WareID{
+							map[ItemName]rdef.WareID{
 								"item-a": {"war", "asdf"},
 								"item-b": {"war", "qwer"},
 							},
@@ -80,7 +80,7 @@ func TestSerial(t *testing.T) {
 					"cname",
 					[]ReleaseEntry{
 						{"1.1",
-							map[ItemLabel]rdef.WareID{
+							map[ItemName]rdef.WareID{
 								"src":         {"tar", "egruihieur"},
 								"docs":        {"tar", "387ty874yt"},
 								"linux-amd64": {"tar", "ooijpwoeij"},
@@ -173,11 +173,11 @@ func TestSerial(t *testing.T) {
 										},
 									},
 								},
-								// The products map has the same keys as the Release's ItemLabels.
+								// The products map has the same keys as the Release's ItemNames.
 								// When these wires are resolved, the indicated RunRecords in this
 								// Replay MUST express the exact same WareID hash
-								// as the ReleaseRecord's top level ItemLabel->WareID map.
-								Products: map[ItemLabel]ReleaseItemID{
+								// as the ReleaseRecord's top level ItemName->WareID map.
+								Products: map[ItemName]ReleaseItemID{
 									"src":         {"wire", "prepare-step", "/task/output/src"},
 									"docs":        {"wire", "prepare-step", "/task/output/docs"},
 									"linux-amd64": {"wire", "build-linux", "/task/output"},
@@ -185,7 +185,7 @@ func TestSerial(t *testing.T) {
 							},
 						},
 						{"1.0",
-							map[ItemLabel]rdef.WareID{
+							map[ItemName]rdef.WareID{
 								"src":         {"war", "asdf"},
 								"docs":        {"war", "ayhf"},
 								"linux-amd64": {"war", "qwer"},

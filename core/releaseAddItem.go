@@ -9,7 +9,7 @@ import (
 	"go.polydawn.net/hitch/lib/locator"
 )
 
-func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) error {
+func ReleaseAddItem(ui UI, itemNameStr, wareStr string) error {
 	// Find hitch.db root.
 	dbctrl, err := db.LoadByCwd()
 	switch err.(type) {
@@ -25,7 +25,7 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) error {
 	// The "wareRef" param may be a "wire" type reference to a step (which is much more complicated),
 	// or, just a regular "{type}:{hash}" WareID.
 	// TODO : deal with this, or perhaps split the wire mode into a different subcommand for clarity.
-	labelName := api.ItemLabel(labelNameStr)
+	itemName := api.ItemName(itemNameStr)
 	wareID, err := rdef.ParseWareID(wareStr)
 	if err != nil {
 		return Errorf(ErrBadArgs, "invalid ware reference -- %s", err)
@@ -44,12 +44,12 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) error {
 		panic(err)
 	}
 
-	// Insert the label.  Then tell the stage state to save itself.
+	// Insert the item.  Then tell the stage state to save itself.
 	items := stageCtrl.Catalog.Releases[0].Items
 	if items == nil {
-		items = make(map[api.ItemLabel]rdef.WareID)
+		items = make(map[api.ItemName]rdef.WareID)
 	}
-	items[labelName] = wareID
+	items[itemName] = wareID
 	stageCtrl.Catalog.Releases[0].Items = items
 	if err := stageCtrl.Save(); err != nil {
 		return Errorf(ErrFS, "error while saving staged state -- %s", err)

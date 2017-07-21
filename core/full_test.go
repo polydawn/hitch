@@ -7,6 +7,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	. "go.polydawn.net/hitch/lib/errcat"
 	. "go.polydawn.net/hitch/lib/testutil"
 )
 
@@ -19,17 +20,17 @@ func Test(t *testing.T) {
 	Convey("Initialization / db-finding scenarios", t, func() {
 		WithChdirTmpdir(func() {
 			Convey("init happy path", func() {
-				So(Init(ui), ShouldEqual, EXIT_SUCCESS)
+				So(Init(ui), ShouldErrorWith, nil)
 			})
 			Convey("init repeated should fail", func() {
-				So(Init(ui), ShouldEqual, EXIT_SUCCESS)
-				So(Init(ui), ShouldEqual, EXIT_INPROGRESS)
+				So(Init(ui), ShouldErrorWith, nil)
+				So(Init(ui), ShouldErrorWith, ErrInProgress)
 			})
 			Convey("init inside another db should fail", func() {
-				So(Init(ui), ShouldEqual, EXIT_SUCCESS)
+				So(Init(ui), ShouldErrorWith, nil)
 				So(os.Mkdir("deeper", 0755), ShouldBeNil)
 				So(os.Chdir("deeper"), ShouldBeNil)
-				So(Init(ui), ShouldEqual, EXIT_INPROGRESS)
+				So(Init(ui), ShouldErrorWith, ErrInProgress)
 			})
 		})
 	})

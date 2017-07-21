@@ -8,10 +8,9 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 
 	"."
-	"go.polydawn.net/hitch/core"
 )
 
-func callMain(args []string, stdin io.Reader) (string, string, core.ExitCode) {
+func callMain(args []string, stdin io.Reader) (string, string, main.ExitCode) {
 	if stdin == nil {
 		stdin = &bytes.Buffer{}
 	}

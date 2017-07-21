@@ -50,16 +50,19 @@ func ReleaseCommit(ui UI) error {
 	}
 	_ = catalog
 
-	// Do completion and sanity checks.
+	// Do completion and sanity checks on the staged content.
 	// You can exempt yourself from some of these by using additional command flags;
 	//  the default is to halt and exit on any warnings at all.
 	// TODO ...!
 
 	// Merge the new release record into the existing catalog.
+	// This process contains additional sanity checks; for example, colliding
+	//  with an existing release name will be rejected.
 	// TODO
 
 	// Save the updated catalog.  Delete the staged state.
 	// TODO
+	stage.Clear(dbctrl, stage.DefaultPath)
 
 	return nil
 }

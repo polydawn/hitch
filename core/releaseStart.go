@@ -56,8 +56,11 @@ func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) error {
 	}
 
 	// Check for catalog+release already existing.  Reject if released before.
-	// TODO : come back here after writing more db inspection methods.
-	_ = catalog
+	for _, release := range catalog.Releases {
+		if release.Name == releaseName {
+			return Errorf(ErrInProgress, "\"%s:%s\" is already a catalogued release!  releases must have a unique name.")
+		}
+	}
 
 	// If catalog has signing keys set up, check that we have those keys.
 	// FUTURE : signing keys are in the roadmap, but a fair ways off.

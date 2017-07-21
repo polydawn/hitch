@@ -101,3 +101,7 @@ func (stageCtrl *Controller) load(r io.Reader) error {
 		Unmarshal(&stageCtrl.Catalog)
 	return Errorw(ErrStorageCorrupt, err)
 }
+
+func Clear(dbctrl *db.Controller, stagePath string) error {
+	return Errorw(ErrIO, os.RemoveAll(filepath.Join(dbctrl.BasePath, stagePath)))
+}

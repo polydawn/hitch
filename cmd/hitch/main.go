@@ -33,6 +33,7 @@ var (
 	releaseAddItemCmd         = releaseCmd.Command("add-item", "Add a ware to the set of data in the release, and assigns it a name.")
 	releaseAddItem_ItemArg    = releaseAddItemCmd.Arg("itemName", "The label to map the ware.").Required().String()
 	releaseAddItem_WareArg    = releaseAddItemCmd.Arg("ware", "The WareID this label will be mapped to.").Required().String()
+	releaseCommitCmd          = releaseCmd.Command("commit", "Finish the release currently being staged: commit it to the hitch database.")
 
 	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
 )
@@ -71,6 +72,8 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode Ex
 			return core.ReleaseStart(ui, *releaseStart_CatalogArg, *releaseStart_ReleaseArg)
 		case releaseAddItemCmd.FullCommand():
 			return core.ReleaseAddItem(ui, *releaseAddItem_ItemArg, *releaseAddItem_WareArg)
+		case releaseCommitCmd.FullCommand():
+			return core.ReleaseCommit(ui)
 		default:
 			panic(fmt.Errorf("hitch: unhandled command %q", cmd))
 		}

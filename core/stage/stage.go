@@ -77,6 +77,7 @@ func (stageCtrl *Controller) flush(w io.Writer) error {
 	}
 	var buf bytes.Buffer
 	stdjson.Indent(&buf, msg, "", "\t")
+	buf.WriteString("\n")
 	_, err = buf.WriteTo(w)
 	return Errorw(ErrIO, err)
 }

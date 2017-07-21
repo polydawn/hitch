@@ -55,9 +55,9 @@ func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) ExitCode {
 
 	// All checks passed!
 	// Initialize stage state on disk.
-	_, err1 := stage.Create(dbctrl, stage.DefaultPath, catalogName, releaseName)
-	if err1 != nil {
-		fmt.Fprintf(ui.Stderr, "error while initializing stage state -- %s\n", err1)
+	_, err = stage.Create(dbctrl, stage.DefaultPath, catalogName, releaseName)
+	if err != nil {
+		fmt.Fprintf(ui.Stderr, "error while initializing stage state -- %s\n", err)
 		return EXIT_WEIRDFS
 	}
 

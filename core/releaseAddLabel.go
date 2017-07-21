@@ -7,6 +7,7 @@ import (
 	"go.polydawn.net/hitch/api/rdef"
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/core/stage"
+	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
 )
 
@@ -36,18 +37,18 @@ func ReleaseAddLabel(ui UI, labelNameStr, wareStr string) ExitCode {
 	}
 
 	// Load stage state.  Staging must have already been started by `hitch release start`.
-	stageCtrl, err2 := stage.Load(dbctrl, stage.DefaultPath)
-	switch {
-	case err2 == nil:
+	stageCtrl, err := stage.Load(dbctrl, stage.DefaultPath)
+	switch Category(err) {
+	case nil:
 		// pass!
-	case err2.Category == stage.ErrIO:
+	case stage.ErrIO:
 		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
 		return EXIT_WEIRDFS
-	case err2.Category == stage.ErrStorageCorrupt:
+	case stage.ErrStorageCorrupt:
 		fmt.Fprintf(ui.Stderr, "error while reading staged state -- %s\n", err)
 		return EXIT_CORRUPT
 	default:
-		panic(err2)
+		panic(err)
 	}
 
 	// Insert the label.  Then tell the stage state to save itself.

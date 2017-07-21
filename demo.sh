@@ -33,7 +33,21 @@ mkdir -p "$demodir" && cd "$demodir" && demodir="$(pwd)"
 (
 	loudly hitch init
 	loudly hitch release start "proj.net/team/thing" "v0.1"
-	loudly hitch release add-item "thingy" "tar:ah4sh28vBa39DVuwI"
-) 2>&1| section "Using hitch is easy!" "See?"
-
+	loudly hitch release add-item "src" "git:e238f861f0bcccbdb08488795707728568fddcbf"
+	loudly hitch release add-item "linux-amd64" "tar:ah4sh28vBa39DVuwI"
+	loudly hitch release add-item "dawrmin-amd64" "tar:ah4shEj9qoveV9DVquwI"
+	loudly hitch release add-item "docs" "tar:ah4sh24iIgjreEj9qov"
+) 2>&1| section \
+"Using hitch is easy!" \
+\
+"See?"
 awaitack
+
+(
+	loudly cat ./hitch.db/_stage/stage.json
+) 2>&1| section \
+"Creating a hitch release is a multi-step process.
+You select a catalog the release will be inserted into, as well
+as the release name; then, you add filesets and assign their labels.
+
+The staged state for the release we've built up so far looks like this:"

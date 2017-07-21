@@ -68,11 +68,13 @@ function loudly { ## Give a full command as args.
 function section { ## Give a before and after string; Pipe in a subshell's worth of stuff (using `loudly`'s inside that works nicely too).
 	before=$(echo "${1:-}" | prefix ' ')
 	after=$(echo "${2:-}" | prefix ' ')
+	echo
 	echo -e "${color_cerulean}${before}${color_none}"
 	echo -e "${color_cerulean}┌──────────────┈${color_none}"
 	cat - | prefix ''
 	echo -e "${color_cerulean}└──────────────┈${color_none}"
 	echo -e "${color_cerulean}${after}${color_none}"
+	echo
 }
 
 

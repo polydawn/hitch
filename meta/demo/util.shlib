@@ -36,7 +36,7 @@ function die {
 ## Utils -- output fmting
 ##
 function prefix { sed 's/^/'"$1"'/' ; }
-function indent { prefix '\t' ; }
+function indent { prefix "${INDENT:-\t}" ; }
 function highlight {
         keyword="$1" ; color="$2"
         sed "$(printf "%b" "s/${keyword}/${color}&${color_none}/")" -
@@ -56,11 +56,11 @@ function loudly { ## Give a full command as args.
 		code=$PIPESTATUS
 		if [ 0 -eq $code ]; then exit; fi
 		>&2 echo -ne \
-			"${color_scream}${color_underline}!!!error!!!${color_ununderline}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈" \
+			"${color_scream}${color_underline}!!!error!!!${color_ununderline}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈${color_none}" \
 			"\n${color_scream}${color_underline}!!!error!!!${color_ununderline}" \
 			"  \"${color_prompt}${cmd}${color_scream}\" died unexpectedly" \
 			"with code ${color_brighten}$code${color_unbrighten}${color_none}" \
-			"\n${color_scream}${color_underline}!!!error!!!${color_ununderline}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈\n"
+			"\n${color_scream}${color_underline}!!!error!!!${color_ununderline}┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈┈${color_none}\n"
 		exit $code
 	)
 	return $PIPESTATUS
@@ -70,7 +70,7 @@ function section { ## Give a before and after string; Pipe in a subshell's worth
 	after=$(echo "${2:-}" | prefix ' ')
 	echo -e "${color_cerulean}${before}${color_none}"
 	echo -e "${color_cerulean}┌──────────────┈${color_none}"
-	cat - | prefix '  '
+	cat - | prefix ''
 	echo -e "${color_cerulean}└──────────────┈${color_none}"
 	echo -e "${color_cerulean}${after}${color_none}"
 }

@@ -87,6 +87,11 @@ func Errorw(category interface{}, cause error) error {
 	return &Error{category, cause.Error(), cause}
 }
 
-func (e Error) Recategorize(category interface{}) *Error {
-	return &Error{category, e.Msg, e.Details}
+func Recategorize(err error, category interface{}) error {
+	switch e2 := err.(type) {
+	case *Error:
+		return &Error{category, e2.Msg, e2.Details}
+	default:
+		return &Error{category, e2.Error(), nil}
+	}
 }

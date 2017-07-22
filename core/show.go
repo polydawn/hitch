@@ -25,42 +25,33 @@ func Show(ui UI, nameStr string) error {
 	// This one is more interesting than usual because the behavior of this
 	//  command changes radically based on how precise of a request was made.
 	tuple, err := api.ParseReleaseItemID(nameStr)
-
-	// Load the requested catalog from the db.
-	catalog, err := dbctrl.LoadCatalog(tuple.CatalogName)
-	switch Category(err) {
-	case nil:
-		// pass!
-	case db.ErrNotFound:
-		return Errorf(ErrDataNotFound, "no catalog found named %q", tuple.CatalogName)
-	case db.ErrIO:
-		return Errorf(ErrFS, "error while reading db -- %s", err)
-	case db.ErrStorageCorrupt:
-		return Errorf(ErrCorruptState, "error while reading db -- %s", err)
-	default:
-		panic(err)
+	if err != nil {
+		return Errorf(ErrBadArgs, "malformed ID tuple: %s", err)
 	}
 
 	// Switch behavior based on specificity of args.
-	_ = catalog
 	switch {
-	case tuple.ItemName != "":
-		return showItem(ui.Stdout, tuple)
-	case tuple.ReleaseName != "":
-		return showRelease(ui.Stdout, tuple)
 	default:
-		return showCatalog(ui.Stdout, tuple)
+		return showCatalog(dbctrl, tuple, ui.Stdout)
+	case tuple.ReleaseName != "":
+		return showRelease(dbctrl, tuple, ui.Stdout)
+	case tuple.ItemName != "":
+		return showItem(dbctrl, tuple, ui.Stdout)
 	}
 }
 
-func showItem(w io.Writer, tuple api.ReleaseItemID) error {
+func showCatalog(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
+	catalog, err := loadCatalog(dbctrl, tuple.CatalogName)
+	if err != nil {
+		return err
+	}
+	return emitPrettyJson(catalog, w)
+}
+
+func showRelease(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
 	return nil
 }
 
-func showRelease(w io.Writer, tuple api.ReleaseItemID) error {
-	return nil
-}
-
-func showCatalog(w io.Writer, tuple api.ReleaseItemID) error {
+func showItem(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
 	return nil
 }

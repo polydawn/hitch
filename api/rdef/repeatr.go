@@ -29,17 +29,21 @@ type WareID struct {
 }
 
 func ParseWareID(x string) (WareID, error) {
-	ss := strings.Split(x, ":")
-	if len(ss) != 2 {
-		return WareID{}, fmt.Errorf("wareIDs always have a single colon (they are of form <type:hash>)")
+	ss := strings.SplitN(x, ":", 2)
+	if len(ss) < 2 {
+		return WareID{}, fmt.Errorf("wareIDs must have contain a colon character (they are of form \"<type>:<hash>\")")
 	}
 	return WareID{ss[0], ss[1]}, nil
+}
+
+func (x WareID) String() string {
+	return x.Type + ":" + x.Hash
 }
 
 var WareID_AtlasEntry = atlas.BuildEntry(WareID{}).Transform().
 	TransformMarshal(atlas.MakeMarshalTransformFunc(
 		func(x WareID) (string, error) {
-			return string(x.Type) + ":" + string(x.Hash), nil
+			return x.String(), nil
 		})).
 	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
 		func(x string) (WareID, error) {

@@ -1,8 +1,10 @@
 package core
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -46,7 +48,7 @@ func Test(t *testing.T) {
 	})
 	Convey("Release staging operations", t, func() {
 		WithChdirTmpdir(func() {
-			So(Init(ui), ShouldErrorWith, nil)
+			Must(Init(ui))
 
 			Convey("starting a release to a nonexistent catalog should be rejected", func() {
 				So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, ErrDataNotFound)
@@ -85,4 +87,73 @@ func Test(t *testing.T) {
 			})
 		})
 	})
+	Convey("Show command operations", t, func() {
+		WithChdirTmpdir(func() {
+			Must(Init(ui))
+
+			Convey("given a sizable catalog", func() {
+				Must(CatalogCreate(ui, "cn"))
+				Must(ReleaseStart(ui, "cn", "v0.1"))
+				Must(ReleaseAddItem(ui, "label-foo", "tar:asdfasdf"))
+				Must(ReleaseAddItem(ui, "label-bar", "tar:asdfqwer"))
+				Must(ReleaseCommit(ui))
+				Must(ReleaseStart(ui, "cn", "v0.2"))
+				Must(ReleaseAddItem(ui, "label-foo", "tar:qwerasdf"))
+				Must(ReleaseAddItem(ui, "label-bar", "tar:qwerqwer"))
+				Must(ReleaseAddItem(ui, "label-qux", "tar:qwerzxcv"))
+				Must(ReleaseCommit(ui))
+
+				Convey("`hitch show <catalog>` should say a *lot*", func() {
+					output, err := grabOutput(func(ui UI) error {
+						return Show(ui, "cn")
+					})
+					So(err, ShouldErrorWith, nil)
+					So(output, ShouldContainSubstring, `"cn"`)              // catalogs contain their own name
+					So(output, ShouldContainSubstring, `"v0.1"`)            // both release names should appear
+					So(output, ShouldContainSubstring, `"v0.2"`)            // both release names should appear
+					So(output, ShouldContainSubstring, `"tar:asdfasdf"`)    // wareIDs in the first release should appear -- showing a catalog is *loud*!
+					So(output, ShouldContainSubstring, `"tar:qwerqwer"`)    // wareIDs in the second release should appear -- showing a catalog is *loud*!
+					So(strings.Count(output, `"metadata"`), ShouldEqual, 2) // keyword "metadata" should appear once per release entry
+				})
+				Convey("`hitch show <catalog>` requesting a non-existent catalog name should error", func() {
+					So(Show(ui, "notgonnafindit"), ShouldErrorWith, ErrDataNotFound)
+				})
+				Convey("`hitch show <catalog>:<release>` should only show that release", func() {
+					output, err := grabOutput(func(ui UI) error {
+						return Show(ui, "cn:v0.1")
+					})
+					So(err, ShouldErrorWith, nil)
+					So(output, ShouldContainSubstring, `"v0.1"`)            // releases contain their own name
+					So(output, ShouldContainSubstring, `"tar:asdfasdf"`)    // wareIDs in the first release should appear
+					So(strings.Count(output, `"metadata"`), ShouldEqual, 1) // keyword "metadata" should appear once, because it's just one release entry
+					So(output, ShouldNotContainSubstring, `"cn"`)           // releases don't repeat the name of the catalog that contains them
+					So(output, ShouldNotContainSubstring, `"v0.2"`)         // the other releases names certainly shouldn't appear
+					So(output, ShouldNotContainSubstring, `"tar:qwerqwer"`) // wareIDs in the other releases certainly shouldn't should appear
+				})
+				Convey("`hitch show <catalog>:<release>` requesting a non-existent catalog name should error", func() {
+					So(Show(ui, "notgonnafindit:wompwomp"), ShouldErrorWith, ErrDataNotFound)
+				})
+				Convey("`hitch show <catalog>:<release>` requesting a non-existent release name should error", func() {
+					So(Show(ui, "cn:wompwomp"), ShouldErrorWith, ErrDataNotFound)
+				})
+				Convey("`hitch show <catalog>:<release>:<item>` should only show that WareID -- unquoted!", func() {
+					output, err := grabOutput(func(ui UI) error {
+						return Show(ui, "cn:v0.1:label-foo")
+					})
+					So(err, ShouldErrorWith, nil)
+					So(output, ShouldEqual, "tar:asdfasdf\n")
+				})
+				Convey("`hitch show <catalog>:<release>:<item>` requesting a non-existent item name should error", func() {
+					So(Show(ui, "cn:v0.1:notathing"), ShouldErrorWith, ErrDataNotFound)
+				})
+			})
+
+		})
+	})
+}
+
+func grabOutput(fn func(UI) error) (string, error) {
+	var buf bytes.Buffer
+	err := fn(UI{nil, &buf, &buf})
+	return buf.String(), err
 }

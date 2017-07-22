@@ -1,6 +1,7 @@
 package api
 
 import (
+	"fmt"
 	"strings"
 
 	"github.com/polydawn/refmt/obj/atlas"
@@ -38,6 +39,23 @@ type ReleaseItemID struct {
 	CatalogName
 	ReleaseName
 	ItemName
+}
+
+func ParseReleaseItemID(x string) (v ReleaseItemID, err error) {
+	ss := strings.Split(x, ":")
+	switch len(ss) {
+	case 3:
+		v.ItemName = ItemName(ss[2])
+		fallthrough
+	case 2:
+		v.ReleaseName = ReleaseName(ss[1])
+		fallthrough
+	case 1:
+		v.CatalogName = CatalogName(ss[0])
+		return
+	default:
+		return ReleaseItemID{}, fmt.Errorf("ReleaseItemIDs are a colon-separated three-tuple; no more than two colons may appear!")
+	}
 }
 
 var ReleaseItemID_AtlasEntry = atlas.BuildEntry(ReleaseItemID{}).Transform().

@@ -40,7 +40,8 @@ var (
 
 	// inspection commands:
 
-	showCmd = app.Command("show", "Show release info objects, or specific content hashes.")
+	showCmd      = app.Command("show", "Show release info objects, or specific content hashes.")
+	show_nameArg = showCmd.Arg("name", "What to show.  Amount of data shown depends on how specific a name is given: a catalog name alone yields a large amount of data; a catalog:release:item tuple shows just that one WareID.").Required().String()
 
 	// import and sync commands:
 	// FUTURE :)
@@ -84,6 +85,8 @@ func Main(args []string, stdin io.Reader, stdout, stderr io.Writer) (exitCode Ex
 			return core.ReleaseAddItem(ui, *releaseAddItem_ItemArg, *releaseAddItem_WareArg)
 		case releaseCommitCmd.FullCommand():
 			return core.ReleaseCommit(ui)
+		case showCmd.FullCommand():
+			return core.Show(ui, *show_nameArg)
 		default:
 			panic(fmt.Errorf("hitch: unhandled command %q", cmd))
 		}

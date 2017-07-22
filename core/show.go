@@ -1,7 +1,11 @@
 package core
 
 import (
+	"fmt"
+	"io"
+
 	"go.polydawn.net/hitch/api"
+	"go.polydawn.net/hitch/api/rdef"
 	"go.polydawn.net/hitch/core/db"
 	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
@@ -32,7 +36,22 @@ func Show(ui UI, nameStr string) error {
 	if err != nil {
 		return err
 	}
-	return Errorw(ErrPiping, emitPrettyJson(thing, ui.Stdout))
+
+	// Switch default output format depending on what kind of thing we're printing.
+	// Future work: also support more format args, e.g. `--output-as=cbor`, etc.
+	// Defaults are: json for everything, except bare wareIDs, which are plain string.
+	var emitFunc func(interface{}, io.Writer) error
+	switch thing.(type) {
+	case api.Catalog:
+		emitFunc = emitPrettyJson
+	case api.ReleaseEntry:
+		emitFunc = emitPrettyJson
+	case rdef.WareID:
+		emitFunc = func(thing interface{}, w io.Writer) error { _, err := fmt.Fprintf(w, "%s\n", thing); return err }
+	default:
+		panic("unreachable")
+	}
+	return Errorw(ErrPiping, emitFunc(thing, ui.Stdout))
 }
 
 // Yields one of: a Catalog, ReleaseEntry, or WareID -- switching behavior

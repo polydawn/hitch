@@ -136,12 +136,12 @@ func Test(t *testing.T) {
 				Convey("`hitch show <catalog>:<release>` requesting a non-existent release name should error", func() {
 					So(Show(ui, "cn:wompwomp"), ShouldErrorWith, ErrDataNotFound)
 				})
-				Convey("`hitch show <catalog>:<release>:<item>` should only show that item", func() {
+				Convey("`hitch show <catalog>:<release>:<item>` should only show that WareID -- unquoted!", func() {
 					output, err := grabOutput(func(ui UI) error {
 						return Show(ui, "cn:v0.1:label-foo")
 					})
 					So(err, ShouldErrorWith, nil)
-					So(output, ShouldEqual, `"tar:asdfasdf"`+"\n") // FIXME except we probably DO NOT want those quotes here...
+					So(output, ShouldEqual, "tar:asdfasdf\n")
 				})
 				Convey("`hitch show <catalog>:<release>:<item>` requesting a non-existent item name should error", func() {
 					So(Show(ui, "cn:v0.1:notathing"), ShouldErrorWith, ErrDataNotFound)

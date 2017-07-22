@@ -11,6 +11,7 @@ const (
 	EXIT_SUCCESS       ExitCode = 0
 	EXIT_BADARGS       ExitCode = 1 // Indicates usage errors.
 	EXIT_PANIC         ExitCode = 2 // Placeholder.  We don't use this.  '2' happens when golang exits due to panic.
+	EXIT_DATANOTFOUND  ExitCode = 4 // Indicates content not found -- the db was, but the e.g. catalog name (or release name, etc; whatever was requested) was not present.
 	EXIT_CORRUPT       ExitCode = 6 // Indicates saved state is corrupt somehow (does not parse, or fails invariant checks).
 	EXIT_WEIRDFS       ExitCode = 5 // Indicates some I/O error: permission denied, etc.
 	EXIT_DBNOTFOUND    ExitCode = 6 // Returned when a hitch command is used outside of a hitch.db path.
@@ -21,6 +22,7 @@ const (
 var exitMapping = map[core.ErrorCategory]ExitCode{
 	core.ErrBadArgs:       EXIT_BADARGS,
 	core.ErrCorruptState:  EXIT_CORRUPT,
+	core.ErrDataNotFound:  EXIT_DATANOTFOUND,
 	core.ErrFS:            EXIT_WEIRDFS,
 	core.ErrDBNotFound:    EXIT_DBNOTFOUND,
 	core.ErrInProgress:    EXIT_INPROGRESS,

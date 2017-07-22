@@ -36,10 +36,14 @@ func ParseWareID(x string) (WareID, error) {
 	return WareID{ss[0], ss[1]}, nil
 }
 
+func (x WareID) String() string {
+	return x.Type + ":" + x.Hash
+}
+
 var WareID_AtlasEntry = atlas.BuildEntry(WareID{}).Transform().
 	TransformMarshal(atlas.MakeMarshalTransformFunc(
 		func(x WareID) (string, error) {
-			return string(x.Type) + ":" + string(x.Hash), nil
+			return x.String(), nil
 		})).
 	TransformUnmarshal(atlas.MakeUnmarshalTransformFunc(
 		func(x string) (WareID, error) {

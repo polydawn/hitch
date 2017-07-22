@@ -46,7 +46,7 @@ func Test(t *testing.T) {
 	})
 	Convey("Release staging operations", t, func() {
 		WithChdirTmpdir(func() {
-			So(Init(ui), ShouldErrorWith, nil)
+			Must(Init(ui))
 
 			Convey("starting a release to a nonexistent catalog should be rejected", func() {
 				So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, ErrDataNotFound)
@@ -87,19 +87,19 @@ func Test(t *testing.T) {
 	})
 	Convey("Show command operations", t, func() {
 		WithChdirTmpdir(func() {
-			So(Init(ui), ShouldErrorWith, nil)
+			Must(Init(ui))
 
 			Convey("given a sizable catalog", func() {
-				So(CatalogCreate(ui, "cn"), ShouldErrorWith, nil)
-				So(ReleaseStart(ui, "cn", "v0.1"), ShouldErrorWith, nil)
-				So(ReleaseAddItem(ui, "label-foo", "tar:asdfasdf"), ShouldErrorWith, nil)
-				So(ReleaseAddItem(ui, "label-bar", "tar:asdfqwer"), ShouldErrorWith, nil)
-				So(ReleaseCommit(ui), ShouldErrorWith, nil)
-				So(ReleaseStart(ui, "cn", "v0.2"), ShouldErrorWith, nil)
-				So(ReleaseAddItem(ui, "label-foo", "tar:qwerasdf"), ShouldErrorWith, nil)
-				So(ReleaseAddItem(ui, "label-bar", "tar:qwerqwer"), ShouldErrorWith, nil)
-				So(ReleaseAddItem(ui, "label-qux", "tar:qwerzxcv"), ShouldErrorWith, nil)
-				So(ReleaseCommit(ui), ShouldErrorWith, nil)
+				Must(CatalogCreate(ui, "cn"))
+				Must(ReleaseStart(ui, "cn", "v0.1"))
+				Must(ReleaseAddItem(ui, "label-foo", "tar:asdfasdf"))
+				Must(ReleaseAddItem(ui, "label-bar", "tar:asdfqwer"))
+				Must(ReleaseCommit(ui))
+				Must(ReleaseStart(ui, "cn", "v0.2"))
+				Must(ReleaseAddItem(ui, "label-foo", "tar:qwerasdf"))
+				Must(ReleaseAddItem(ui, "label-bar", "tar:qwerqwer"))
+				Must(ReleaseAddItem(ui, "label-qux", "tar:qwerzxcv"))
+				Must(ReleaseCommit(ui))
 
 				Convey("`hitch show <catalog>` should say a *lot*", func() {
 					// TODO both release names appear, "metadata" shows up twice, etc.

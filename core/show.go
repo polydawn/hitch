@@ -1,8 +1,6 @@
 package core
 
 import (
-	"io"
-
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
 	. "go.polydawn.net/hitch/lib/errcat"
@@ -30,34 +28,35 @@ func Show(ui UI, nameStr string) error {
 	}
 
 	// Switch behavior based on specificity of args.
-	switch {
-	default:
-		return showCatalog(dbctrl, tuple, ui.Stdout)
-	case tuple.ReleaseName != "":
-		return showRelease(dbctrl, tuple, ui.Stdout)
-	case tuple.ItemName != "":
-		return showItem(dbctrl, tuple, ui.Stdout)
-	}
-}
-
-func showCatalog(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
-	catalog, err := loadCatalog(dbctrl, tuple.CatalogName)
+	thing, err := getThing(dbctrl, tuple)
 	if err != nil {
 		return err
 	}
-	return Errorw(ErrPiping, emitPrettyJson(catalog, w))
+	return Errorw(ErrPiping, emitPrettyJson(thing, ui.Stdout))
 }
 
-func showRelease(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
+// Yields one of: a Catalog, ReleaseEntry, or WareID -- switching behavior
+// based on how much info is provided in the tuple argument.
+func getThing(dbctrl *db.Controller, tuple api.ReleaseItemID) (interface{}, error) {
 	catalog, err := loadCatalog(dbctrl, tuple.CatalogName)
 	if err != nil {
-		return err
+		return nil, err
+	}
+	if tuple.ReleaseName == "" {
+		return catalog, nil
 	}
 	release, exists := selectRelease(catalog.Releases, tuple.ReleaseName)
 	if !exists {
-		return Errorf(ErrDataNotFound, "no release named %q in catalog %q", tuple.ReleaseName, tuple.CatalogName)
+		return nil, Errorf(ErrDataNotFound, "no release named %q in catalog %q", tuple.ReleaseName, tuple.CatalogName)
 	}
-	return Errorw(ErrPiping, emitPrettyJson(release, w))
+	if tuple.ItemName == "" {
+		return release, nil
+	}
+	wareID, exists := release.Items[tuple.ItemName]
+	if !exists {
+		return nil, Errorf(ErrDataNotFound, "no item labeled %q in release %q", tuple.ItemName, tuple.ReleaseName)
+	}
+	return wareID, nil
 }
 
 func selectRelease(releases []api.ReleaseEntry, name api.ReleaseName) (api.ReleaseEntry, bool) {
@@ -71,8 +70,4 @@ func selectRelease(releases []api.ReleaseEntry, name api.ReleaseName) (api.Relea
 		}
 	}
 	return api.ReleaseEntry{}, false
-}
-
-func showItem(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
-	return nil
 }

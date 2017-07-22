@@ -85,4 +85,33 @@ func Test(t *testing.T) {
 			})
 		})
 	})
+	Convey("Show command operations", t, func() {
+		WithChdirTmpdir(func() {
+			So(Init(ui), ShouldErrorWith, nil)
+
+			Convey("given a sizable catalog", func() {
+				So(CatalogCreate(ui, "cn"), ShouldErrorWith, nil)
+				So(ReleaseStart(ui, "cn", "v0.1"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-foo", "tar:asdfasdf"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-bar", "tar:asdfqwer"), ShouldErrorWith, nil)
+				So(ReleaseCommit(ui), ShouldErrorWith, nil)
+				So(ReleaseStart(ui, "cn", "v0.2"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-foo", "tar:qwerasdf"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-bar", "tar:qwerqwer"), ShouldErrorWith, nil)
+				So(ReleaseAddItem(ui, "label-qux", "tar:qwerzxcv"), ShouldErrorWith, nil)
+				So(ReleaseCommit(ui), ShouldErrorWith, nil)
+
+				Convey("`hitch show <catalog>` should say a *lot*", func() {
+					// TODO both release names appear, "metadata" shows up twice, etc.
+				})
+				Convey("`hitch show <catalog>` with invalid catalog name should fail", func() {
+					So(Show(ui, "notgonnafindit"), ShouldErrorWith, ErrDataNotFound)
+				})
+				Convey("`hitch show <catalog>:<release>` should only show that release", func() {
+					// TODO "metadata" shows up once, "v0.1" shows up never, etc.
+				})
+			})
+
+		})
+	})
 }

@@ -45,7 +45,8 @@ func showCatalog(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) er
 	if err != nil {
 		return err
 	}
-	return emitPrettyJson(catalog, w)
+	err = emitPrettyJson(catalog, w)
+	return Errorf(ErrPiping, "error while piping data -- %s", err)
 }
 
 func showRelease(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {

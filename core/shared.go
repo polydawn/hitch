@@ -41,6 +41,11 @@ func loadCatalog(dbctrl *db.Controller, name api.CatalogName) (api.Catalog, erro
 
 // Serialize the 'thing' with the api.Atlas and write
 // as pretty-printed json.
+//
+// Errors from pushing into the writer are returned as-is:
+// caller should filter and flag them based on what job the writer
+// was doing (either ErrFS or ErrPiping may be approripate).
+// Serialization fails will be panicked: they are bugs.
 func emitPrettyJson(thing interface{}, w io.Writer) error {
 	msg, err := json.MarshalAtlased(thing, api.Atlas)
 	if err != nil {

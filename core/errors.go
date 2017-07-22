@@ -10,4 +10,5 @@ const (
 	ErrDBNotFound    ErrorCategory = "dbnotfound"    // Returned when a hitch command is used outside of a hitch.db path.
 	ErrInProgress    ErrorCategory = "inprogress"    // Indicates desired operation is already begun -- e.g., `hitch init` is used and a hitch.db already exists; `hitch release start` when something is already staged, etc.
 	ErrNameCollision ErrorCategory = "namecollision" // Indicates that a name is already used, e.g. a catalog already has a release of the same name you just tried to create, etc.
+	ErrPiping        ErrorCategory = "pipecollapse"  // Returned when IO to the *user* (e.g. stdout) fails.  (*Not* when disk or db IO fails.)
 )

@@ -68,10 +68,9 @@ func Test(t *testing.T) {
 					Convey("starting a new release with a new name should fly", func() {
 						So(ReleaseStart(ui, "cn", "rn-v200"), ShouldErrorWith, nil)
 					})
-					// TODO : finish giving hitch-release-commit actually impacts!!!
-					//	Convey("starting a new release with the same name should be rejected", func() {
-					//		So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, ErrInProgress)
-					//	})
+					Convey("starting a new release with the same name should be rejected", func() {
+						So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, ErrInProgress)
+					})
 				})
 			})
 			Convey("starting a release twice should be rejected", func() {

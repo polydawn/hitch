@@ -62,7 +62,7 @@ func ReleaseCommit(ui UI) error {
 	switch Category(err) {
 	case nil:
 		// pass!
-	case ErrInProgress:
+	case ErrNameCollision:
 		return err
 	default:
 		panic(err)
@@ -100,8 +100,7 @@ func mergeCatalogs(cat1, cat2 api.Catalog) (api.Catalog, error) {
 	}
 	for i, release := range cat1.Releases {
 		if _, exists := newNames[release.Name]; exists {
-			// FIXME this really is an excessive stretch of the meaning of "inprogress"
-			return api.Catalog{}, Errorf(ErrInProgress, "merge failed -- old and new catalogs both have a release named %q!", release.Name)
+			return api.Catalog{}, Errorf(ErrNameCollision, "merge failed -- old and new catalogs both have a release named %q!", release.Name)
 		}
 		releases[nNew+i] = release
 	}

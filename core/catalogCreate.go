@@ -27,7 +27,7 @@ func CatalogCreate(ui UI, catalogNameStr string) error {
 	_, err = dbctrl.LoadCatalog(catalogName)
 	switch Category(err) {
 	case nil:
-		return Errorf(ErrInProgress, "a catalog of that name already exists!")
+		return Errorf(ErrNameCollision, "a catalog of that name already exists!")
 	case db.ErrNotFound:
 		// pass!
 	case db.ErrIO:

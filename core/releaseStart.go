@@ -58,7 +58,7 @@ func ReleaseStart(ui UI, catalogNameStr, releaseNameStr string) error {
 	// Check for catalog+release already existing.  Reject if released before.
 	for _, release := range catalog.Releases {
 		if release.Name == releaseName {
-			return Errorf(ErrInProgress, "\"%s:%s\" is already a catalogued release!  releases must have a unique name.")
+			return Errorf(ErrNameCollision, "\"%s:%s\" is already a catalogued release!  releases must have a unique name.", catalog.Name, release.Name)
 		}
 	}
 

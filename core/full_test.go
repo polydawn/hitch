@@ -69,7 +69,7 @@ func Test(t *testing.T) {
 						So(ReleaseStart(ui, "cn", "rn-v200"), ShouldErrorWith, nil)
 					})
 					Convey("starting a new release with the same name should be rejected", func() {
-						So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, ErrInProgress)
+						So(ReleaseStart(ui, "cn", "rn"), ShouldErrorWith, ErrNameCollision)
 					})
 				})
 			})

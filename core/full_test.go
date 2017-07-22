@@ -115,11 +115,26 @@ func Test(t *testing.T) {
 					So(output, ShouldContainSubstring, `"tar:qwerqwer"`)    // wareIDs in the second release should appear -- showing a catalog is *loud*!
 					So(strings.Count(output, `"metadata"`), ShouldEqual, 2) // keyword "metadata" should appear once per release entry
 				})
-				Convey("`hitch show <catalog>` with invalid catalog name should fail", func() {
+				Convey("`hitch show <catalog>` requesting a non-existent catalog name should error", func() {
 					So(Show(ui, "notgonnafindit"), ShouldErrorWith, ErrDataNotFound)
 				})
 				Convey("`hitch show <catalog>:<release>` should only show that release", func() {
-					// TODO "metadata" shows up once, "v0.1" shows up never, etc.
+					output, err := grabOutput(func(ui UI) error {
+						return Show(ui, "cn:v0.1")
+					})
+					So(err, ShouldErrorWith, nil)
+					So(output, ShouldContainSubstring, `"v0.1"`)            // releases contain their own name
+					So(output, ShouldContainSubstring, `"tar:asdfasdf"`)    // wareIDs in the first release should appear
+					So(strings.Count(output, `"metadata"`), ShouldEqual, 1) // keyword "metadata" should appear once, because it's just one release entry
+					So(output, ShouldNotContainSubstring, `"cn"`)           // releases don't repeat the name of the catalog that contains them
+					So(output, ShouldNotContainSubstring, `"v0.2"`)         // the other releases names certainly shouldn't appear
+					So(output, ShouldNotContainSubstring, `"tar:qwerqwer"`) // wareIDs in the other releases certainly shouldn't should appear
+				})
+				Convey("`hitch show <catalog>:<release>` requesting a non-existent catalog name should error", func() {
+					So(Show(ui, "notgonnafindit:wompwomp"), ShouldErrorWith, ErrDataNotFound)
+				})
+				Convey("`hitch show <catalog>:<release>` requesting a non-existent release name should error", func() {
+					So(Show(ui, "cn:wompwomp"), ShouldErrorWith, ErrDataNotFound)
 				})
 			})
 

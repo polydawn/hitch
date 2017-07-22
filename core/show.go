@@ -49,7 +49,28 @@ func showCatalog(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) er
 }
 
 func showRelease(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {
-	return nil
+	catalog, err := loadCatalog(dbctrl, tuple.CatalogName)
+	if err != nil {
+		return err
+	}
+	release, exists := selectRelease(catalog.Releases, tuple.ReleaseName)
+	if !exists {
+		return Errorf(ErrDataNotFound, "no release named %q in catalog %q", tuple.ReleaseName, tuple.CatalogName)
+	}
+	return Errorw(ErrPiping, emitPrettyJson(release, w))
+}
+
+func selectRelease(releases []api.ReleaseEntry, name api.ReleaseName) (api.ReleaseEntry, bool) {
+	// O(n) search :/
+	// But since we store them linearly, this is pretty much the way of it.
+	// Bagging them up into a map would pay the same cost, and we tend not to
+	// need to run this select more than once in the whole life of a task, so it's moot.
+	for _, release := range releases {
+		if release.Name == name {
+			return release, true
+		}
+	}
+	return api.ReleaseEntry{}, false
 }
 
 func showItem(dbctrl *db.Controller, tuple api.ReleaseItemID, w io.Writer) error {

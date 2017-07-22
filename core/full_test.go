@@ -1,8 +1,10 @@
 package core
 
 import (
+	"bytes"
 	"io/ioutil"
 	"os"
+	"strings"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -102,7 +104,16 @@ func Test(t *testing.T) {
 				Must(ReleaseCommit(ui))
 
 				Convey("`hitch show <catalog>` should say a *lot*", func() {
-					// TODO both release names appear, "metadata" shows up twice, etc.
+					output, err := grabOutput(func(ui UI) error {
+						return Show(ui, "cn")
+					})
+					So(err, ShouldErrorWith, nil)
+					So(output, ShouldContainSubstring, `"cn"`)              // catalogs contain their own name
+					So(output, ShouldContainSubstring, `"v0.1"`)            // both release names should appear
+					So(output, ShouldContainSubstring, `"v0.2"`)            // both release names should appear
+					So(output, ShouldContainSubstring, `"tar:asdfasdf"`)    // wareIDs in the first release should appear -- showing a catalog is *loud*!
+					So(output, ShouldContainSubstring, `"tar:qwerqwer"`)    // wareIDs in the second release should appear -- showing a catalog is *loud*!
+					So(strings.Count(output, `"metadata"`), ShouldEqual, 2) // keyword "metadata" should appear once per release entry
 				})
 				Convey("`hitch show <catalog>` with invalid catalog name should fail", func() {
 					So(Show(ui, "notgonnafindit"), ShouldErrorWith, ErrDataNotFound)
@@ -114,4 +125,10 @@ func Test(t *testing.T) {
 
 		})
 	})
+}
+
+func grabOutput(fn func(UI) error) (string, error) {
+	var buf bytes.Buffer
+	err := fn(UI{nil, &buf, &buf})
+	return buf.String(), err
 }

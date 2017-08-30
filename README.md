@@ -1,4 +1,4 @@
-hitch
+hitch [![GoDoc](https://godoc.org/github.com/polydawn/hitch?status.svg)](https://godoc.org/github.com/polydawn/hitch)
 =====
 
 `hitch` is two things:

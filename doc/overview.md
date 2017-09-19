@@ -55,7 +55,21 @@ Situations in which you want to use Hitch directly as a user are mostly:
 What is a Release?
 ------------------
 
-A `hitch` "release" is the process of picking a (human-readable!) name, and
-declaring that it maps to a WareID.
-This resolves the problem of opaqueness in WareIDs.
-Making a `hitch` release is a way to publish semantic identities of Wares.
+Long story short, a Hitch "release" maps a human-readable name to a WareID.
+Once data is encapsulated into a Hitch release, Hitch tools can easily send,
+recieve, and merge snapshots of release info with others.
+
+Long story long, we do a few more things:
+
+- Releases are gathered together in a "Catalog".
+   We use this to represent authorship over time.
+- Releases can refer to *several* WareIDs, each with their own "[Label](./labels.md)".
+   We use this to describe release of e.g. a linux build and a mac build of the same project.
+- Metadata to help with [Versioning](./versioning.md) can be attached to each release.
+   Other parts of the Timeless Stack use this info to compute automatic updates.
+- Instructions for building the named WareIDs can be included in the Release -- these are called [Replay](./replays.md) instructions,
+   and they're in a standardized, container-based format which *you can evaluate automatically*.
+
+So, when you make a release, you can include all this data.
+Hitch will store it in a standard format, which makes it easy to query programmatically,
+and makes the information consumable by the rest of the Timeless Stack ecosystem.

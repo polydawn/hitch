@@ -1,8 +1,9 @@
 package main
 
 import (
+	"github.com/polydawn/go-errcat"
+
 	"go.polydawn.net/hitch/core"
-	"go.polydawn.net/hitch/lib/errcat"
 )
 
 type ExitCode int

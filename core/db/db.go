@@ -7,10 +7,10 @@ import (
 	"path/filepath"
 	"strings"
 
+	. "github.com/polydawn/go-errcat"
 	"github.com/polydawn/refmt/json"
 
-	"go.polydawn.net/hitch/api"
-	. "go.polydawn.net/hitch/lib/errcat"
+	"go.polydawn.net/go-timeless-api"
 )
 
 type Controller struct {
@@ -34,14 +34,14 @@ func (dbctrl *Controller) LoadCatalog(catalogName api.CatalogName) (api.Catalog,
 		if os.IsNotExist(err) {
 			return api.Catalog{}, Errorf(ErrNotFound, "no catalog named %q in db", catalogName)
 		}
-		return api.Catalog{}, Errorw(ErrIO, err)
+		return api.Catalog{}, Recategorize(ErrIO, err)
 	}
 	defer f.Close()
 
 	var catalog api.Catalog
-	err = json.NewUnmarshallerAtlased(f, api.Atlas).
+	err = json.NewUnmarshallerAtlased(f, api.HitchAtlas).
 		Unmarshal(&catalog)
-	return catalog, Errorw(ErrStorageCorrupt, err)
+	return catalog, Recategorize(ErrStorageCorrupt, err)
 }
 
 /*
@@ -55,15 +55,15 @@ func (dbctrl *Controller) SaveCatalog(catalog api.Catalog) error {
 	catalogPath := filepath.Join(append([]string{dbctrl.BasePath}, catalogNameChunks...)...)
 
 	if err := os.MkdirAll(catalogPath, 0755); err != nil {
-		return Errorw(ErrIO, err)
+		return Recategorize(ErrIO, err)
 	}
 	f, err := os.OpenFile(filepath.Join(catalogPath, "catalog.json"), os.O_WRONLY|os.O_CREATE|os.O_TRUNC, 0644)
 	if err != nil {
-		return Errorw(ErrIO, err)
+		return Recategorize(ErrIO, err)
 	}
 	defer f.Close()
 
-	msg, err := json.MarshalAtlased(catalog, api.Atlas)
+	msg, err := json.MarshalAtlased(catalog, api.HitchAtlas)
 	if err != nil {
 		panic(err) // marshalling into a buffer shouldn't fail!
 	}
@@ -71,5 +71,5 @@ func (dbctrl *Controller) SaveCatalog(catalog api.Catalog) error {
 	stdjson.Indent(&buf, msg, "", "\t")
 	buf.WriteString("\n")
 	_, err = buf.WriteTo(f)
-	return Errorw(ErrIO, err)
+	return Recategorize(ErrIO, err)
 }

@@ -1,9 +1,10 @@
 package core
 
 import (
-	"go.polydawn.net/hitch/api"
+	. "github.com/polydawn/go-errcat"
+
+	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"
-	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
 )
 

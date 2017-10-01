@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"io"
 
-	"go.polydawn.net/hitch/api"
-	"go.polydawn.net/hitch/api/rdef"
+	. "github.com/polydawn/go-errcat"
+
+	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"
-	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
 )
 
@@ -46,12 +46,12 @@ func Show(ui UI, nameStr string) error {
 		emitFunc = emitPrettyJson
 	case api.ReleaseEntry:
 		emitFunc = emitPrettyJson
-	case rdef.WareID:
+	case api.WareID:
 		emitFunc = func(thing interface{}, w io.Writer) error { _, err := fmt.Fprintf(w, "%s\n", thing); return err }
 	default:
 		panic("unreachable")
 	}
-	return Errorw(ErrPiping, emitFunc(thing, ui.Stdout))
+	return Recategorize(ErrPiping, emitFunc(thing, ui.Stdout))
 }
 
 // Yields one of: a Catalog, ReleaseEntry, or WareID -- switching behavior

@@ -4,10 +4,11 @@ import (
 	"os"
 	"path/filepath"
 
+	. "github.com/polydawn/go-errcat"
+
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/core/stage"
-	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
 )
 

@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"io"
 
+	. "github.com/polydawn/go-errcat"
+
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/api/rdef"
 	"go.polydawn.net/hitch/core/db"
-	. "go.polydawn.net/hitch/lib/errcat"
 	"go.polydawn.net/hitch/lib/locator"
 )
 
@@ -51,7 +52,7 @@ func Show(ui UI, nameStr string) error {
 	default:
 		panic("unreachable")
 	}
-	return Errorw(ErrPiping, emitFunc(thing, ui.Stdout))
+	return Recategorize(ErrPiping, emitFunc(thing, ui.Stdout))
 }
 
 // Yields one of: a Catalog, ReleaseEntry, or WareID -- switching behavior

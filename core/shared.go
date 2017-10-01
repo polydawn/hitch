@@ -5,11 +5,11 @@ import (
 	stdjson "encoding/json"
 	"io"
 
+	. "github.com/polydawn/go-errcat"
 	"github.com/polydawn/refmt/json"
 
 	"go.polydawn.net/hitch/api"
 	"go.polydawn.net/hitch/core/db"
-	. "go.polydawn.net/hitch/lib/errcat"
 )
 
 // Bundles the "UI" types -- stdin/out/err.

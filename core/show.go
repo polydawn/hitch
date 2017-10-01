@@ -6,8 +6,7 @@ import (
 
 	. "github.com/polydawn/go-errcat"
 
-	"go.polydawn.net/hitch/api"
-	"go.polydawn.net/hitch/api/rdef"
+	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/lib/locator"
 )
@@ -47,7 +46,7 @@ func Show(ui UI, nameStr string) error {
 		emitFunc = emitPrettyJson
 	case api.ReleaseEntry:
 		emitFunc = emitPrettyJson
-	case rdef.WareID:
+	case api.WareID:
 		emitFunc = func(thing interface{}, w io.Writer) error { _, err := fmt.Fprintf(w, "%s\n", thing); return err }
 	default:
 		panic("unreachable")

@@ -3,8 +3,7 @@ package core
 import (
 	. "github.com/polydawn/go-errcat"
 
-	"go.polydawn.net/hitch/api"
-	"go.polydawn.net/hitch/api/rdef"
+	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/core/stage"
 	"go.polydawn.net/hitch/lib/locator"
@@ -27,7 +26,7 @@ func ReleaseAddItem(ui UI, itemNameStr, wareStr string) error {
 	// or, just a regular "{type}:{hash}" WareID.
 	// TODO : deal with this, or perhaps split the wire mode into a different subcommand for clarity.
 	itemName := api.ItemName(itemNameStr)
-	wareID, err := rdef.ParseWareID(wareStr)
+	wareID, err := api.ParseWareID(wareStr)
 	if err != nil {
 		return Errorf(ErrBadArgs, "invalid ware reference -- %s", err)
 	}
@@ -48,7 +47,7 @@ func ReleaseAddItem(ui UI, itemNameStr, wareStr string) error {
 	// Insert the item.  Then tell the stage state to save itself.
 	items := stageCtrl.Catalog.Releases[0].Items
 	if items == nil {
-		items = make(map[api.ItemName]rdef.WareID)
+		items = make(map[api.ItemName]api.WareID)
 	}
 	items[itemName] = wareID
 	stageCtrl.Catalog.Releases[0].Items = items

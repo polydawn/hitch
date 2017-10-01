@@ -1,3 +1,6 @@
+[submodule ".gopath/src/go.polydawn.net/go-timeless-api"]
+	path = .gopath/src/go.polydawn.net/go-timeless-api
+	url = https://github.com/polydawn/go-timeless-api
 [submodule ".gopath/src/github.com/jtolds/gls"]
 	path = .gopath/src/github.com/jtolds/gls
 	url = https://github.com/jtolds/gls

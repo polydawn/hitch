@@ -8,7 +8,7 @@ import (
 	. "github.com/polydawn/go-errcat"
 	"github.com/polydawn/refmt/json"
 
-	"go.polydawn.net/hitch/api"
+	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"
 )
 
@@ -47,7 +47,7 @@ func loadCatalog(dbctrl *db.Controller, name api.CatalogName) (api.Catalog, erro
 // was doing (either ErrFS or ErrPiping may be approripate).
 // Serialization fails will be panicked: they are bugs.
 func emitPrettyJson(thing interface{}, w io.Writer) error {
-	msg, err := json.MarshalAtlased(thing, api.Atlas)
+	msg, err := json.MarshalAtlased(thing, api.HitchAtlas)
 	if err != nil {
 		panic(err) // marshalling into a buffer shouldn't fail!
 	}

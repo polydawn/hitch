@@ -1,8 +1,7 @@
 package core
 
 import (
-	"go.polydawn.net/hitch/api"
-	"go.polydawn.net/hitch/api/rdef"
+	"go.polydawn.net/go-timeless-api"
 )
 
 type ReleaseEntryBuilder struct {
@@ -10,9 +9,9 @@ type ReleaseEntryBuilder struct {
 
 func (x *ReleaseEntryBuilder) AppendStep(
 	name api.StepName,
-	upstream map[*rdef.AbsPath]api.ReleaseItemID, // must onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
-	formula *rdef.Formula, // yes, with hashes.  these HAD BETTER match the upstreams if you check it, but, if upstreams mutate, then, well, that's why we vendored it here.
-	runRecord *rdef.RunRecord, // REVIEW maybe append these separately; verify checks if any step has zero runrecords at end.
+	upstream map[api.AbsPath]api.ReleaseItemID, // must onto (but not necessarily bijection, though lack of may emit warns) the formula inputs.
+	formula api.Formula, // yes, with hashes.  these HAD BETTER match the upstreams if you check it, but, if upstreams mutate, then, well, that's why we vendored it here.
+	runRecord api.RunRecord, // REVIEW maybe append these separately; verify checks if any step has zero runrecords at end.
 ) {
 
 }

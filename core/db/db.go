@@ -10,7 +10,7 @@ import (
 	. "github.com/polydawn/go-errcat"
 	"github.com/polydawn/refmt/json"
 
-	"go.polydawn.net/hitch/api"
+	"go.polydawn.net/go-timeless-api"
 )
 
 type Controller struct {
@@ -39,7 +39,7 @@ func (dbctrl *Controller) LoadCatalog(catalogName api.CatalogName) (api.Catalog,
 	defer f.Close()
 
 	var catalog api.Catalog
-	err = json.NewUnmarshallerAtlased(f, api.Atlas).
+	err = json.NewUnmarshallerAtlased(f, api.HitchAtlas).
 		Unmarshal(&catalog)
 	return catalog, Recategorize(ErrStorageCorrupt, err)
 }
@@ -63,7 +63,7 @@ func (dbctrl *Controller) SaveCatalog(catalog api.Catalog) error {
 	}
 	defer f.Close()
 
-	msg, err := json.MarshalAtlased(catalog, api.Atlas)
+	msg, err := json.MarshalAtlased(catalog, api.HitchAtlas)
 	if err != nil {
 		panic(err) // marshalling into a buffer shouldn't fail!
 	}

@@ -18,7 +18,7 @@ import (
 	. "github.com/polydawn/go-errcat"
 	"github.com/polydawn/refmt/json"
 
-	"go.polydawn.net/hitch/api"
+	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"
 )
 
@@ -71,7 +71,7 @@ func (stageCtrl *Controller) Save() error {
 }
 
 func (stageCtrl *Controller) flush(w io.Writer) error {
-	msg, err := json.MarshalAtlased(stageCtrl.Catalog, api.Atlas)
+	msg, err := json.MarshalAtlased(stageCtrl.Catalog, api.HitchAtlas)
 	if err != nil {
 		panic(err) // marshalling into a buffer shouldn't fail!
 	}
@@ -97,7 +97,7 @@ func Load(dbctrl *db.Controller, stagePath string) (*Controller, error) {
 }
 
 func (stageCtrl *Controller) load(r io.Reader) error {
-	err := json.NewUnmarshallerAtlased(r, api.Atlas).
+	err := json.NewUnmarshallerAtlased(r, api.HitchAtlas).
 		Unmarshal(&stageCtrl.Catalog)
 	return Recategorize(ErrStorageCorrupt, err)
 }

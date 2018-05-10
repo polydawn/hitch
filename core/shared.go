@@ -5,8 +5,8 @@ import (
 	stdjson "encoding/json"
 	"io"
 
-	. "github.com/polydawn/go-errcat"
 	"github.com/polydawn/refmt/json"
+	. "github.com/warpfork/go-errcat"
 
 	"go.polydawn.net/go-timeless-api"
 	"go.polydawn.net/hitch/core/db"

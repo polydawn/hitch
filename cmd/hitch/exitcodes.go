@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/polydawn/go-errcat"
+	"github.com/warpfork/go-errcat"
 
 	"go.polydawn.net/hitch/core"
 )

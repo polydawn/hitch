@@ -7,8 +7,8 @@ import (
 	"strings"
 	"testing"
 
-	. "github.com/polydawn/go-errcat"
 	. "github.com/smartystreets/goconvey/convey"
+	. "github.com/warpfork/go-errcat"
 
 	. "go.polydawn.net/hitch/lib/testutil"
 )

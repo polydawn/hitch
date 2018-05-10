@@ -3,7 +3,7 @@ package core
 import (
 	"os"
 
-	. "github.com/polydawn/go-errcat"
+	. "github.com/warpfork/go-errcat"
 
 	"go.polydawn.net/hitch/core/db"
 	"go.polydawn.net/hitch/lib/locator"

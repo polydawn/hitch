@@ -1,4 +1,4 @@
-package main_test
+package main
 
 import (
 	"bytes"
@@ -6,17 +6,15 @@ import (
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
-
-	"."
 )
 
-func callMain(args []string, stdin io.Reader) (string, string, main.ExitCode) {
+func callMain(args []string, stdin io.Reader) (string, string, ExitCode) {
 	if stdin == nil {
 		stdin = &bytes.Buffer{}
 	}
 	stdout := &bytes.Buffer{}
 	stderr := &bytes.Buffer{}
-	code := main.Main(args, stdin, stdout, stderr)
+	code := Main(args, stdin, stdout, stderr)
 	return stdout.String(), stderr.String(), code
 }
 
